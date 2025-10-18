@@ -56,7 +56,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 /**
  * Status options for filtering
  */
-const STATUS_OPTIONS = ['All Statuses', 'Pending', 'Validated', 'Paid', 'Disputed'];
+const STATUS_OPTIONS = [
+    'All Statuses',
+    'Pending',
+    'Validated',
+    'Paid',
+    'Disputed',
+];
 
 /**
  * Referrals Index Page - View all referrals (sent and received)
@@ -82,12 +88,14 @@ export default function ReferralsIndex({
 }: ReferralsIndexProps) {
     // Direction tab state
     const [activeTab, setActiveTab] = useState<'received' | 'sent' | 'all'>(
-        filters.direction || 'all'
+        filters.direction || 'all',
     );
 
     // Filter states
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
-    const [statusFilter, setStatusFilter] = useState(filters.status || 'All Statuses');
+    const [statusFilter, setStatusFilter] = useState(
+        filters.status || 'All Statuses',
+    );
 
     // Bulk selection state
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -118,7 +126,7 @@ export default function ReferralsIndex({
      * Get status badge variant
      */
     const getStatusBadgeVariant = (
-        status: string
+        status: string,
     ): 'default' | 'secondary' | 'destructive' | 'outline' => {
         switch (status.toLowerCase()) {
             case 'paid':
@@ -151,9 +159,15 @@ export default function ReferralsIndex({
         // Search filter
         const matchesSearch =
             !searchQuery ||
-            referral.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            referral.partner_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            referral.service_type.toLowerCase().includes(searchQuery.toLowerCase());
+            referral.customer_name
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            referral.partner_name
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            referral.service_type
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase());
 
         // Status filter
         const matchesStatus =
@@ -192,7 +206,7 @@ export default function ReferralsIndex({
      */
     const handleToggleSelect = (id: number) => {
         setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+            prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
         );
     };
 
@@ -223,7 +237,7 @@ export default function ReferralsIndex({
                     onSuccess: () => {
                         setSelectedIds([]);
                     },
-                }
+                },
             );
         }
     };
@@ -249,8 +263,8 @@ export default function ReferralsIndex({
                             No referrals yet
                         </h1>
                         <p className="mt-2 text-slate-600 dark:text-slate-400">
-                            Start tracking referrals by logging your first commission
-                            or sharing QR codes with partners
+                            Start tracking referrals by logging your first
+                            commission or sharing QR codes with partners
                         </p>
                         <Button
                             size="lg"
@@ -274,7 +288,7 @@ export default function ReferralsIndex({
                 {/* Header */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white md:text-3xl">
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl dark:text-white">
                             Referrals
                         </h1>
                         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
@@ -327,7 +341,7 @@ export default function ReferralsIndex({
                     <div className="flex flex-1 gap-3">
                         {/* Search */}
                         <div className="relative flex-1 md:max-w-sm">
-                            <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                            <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
                             <Input
                                 type="text"
                                 placeholder="Search referrals..."
@@ -422,80 +436,92 @@ export default function ReferralsIndex({
                                                         }
                                                     />
                                                 </th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                     Customer
                                                 </th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                     Partner
                                                 </th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                     Service
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                     Amount
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                     Commission
                                                 </th>
-                                                <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                <th className="px-4 py-3 text-center text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                     Status
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                     Date
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-950">
-                                            {filteredReferrals.map((referral) => (
-                                                <tr
-                                                    key={referral.id}
-                                                    className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/50"
-                                                >
-                                                    <td className="px-4 py-3">
-                                                        <Checkbox
-                                                            checked={selectedIds.includes(
-                                                                referral.id
-                                                            )}
-                                                            onCheckedChange={() =>
-                                                                handleToggleSelect(
-                                                                    referral.id
-                                                                )
+                                            {filteredReferrals.map(
+                                                (referral) => (
+                                                    <tr
+                                                        key={referral.id}
+                                                        className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/50"
+                                                    >
+                                                        <td className="px-4 py-3">
+                                                            <Checkbox
+                                                                checked={selectedIds.includes(
+                                                                    referral.id,
+                                                                )}
+                                                                onCheckedChange={() =>
+                                                                    handleToggleSelect(
+                                                                        referral.id,
+                                                                    )
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">
+                                                            {
+                                                                referral.customer_name
                                                             }
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">
-                                                        {referral.customer_name}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
-                                                        {referral.partner_name}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
-                                                        {referral.service_type}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-right text-sm font-medium text-slate-900 dark:text-white">
-                                                        {formatCurrency(referral.amount)}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-right text-sm font-semibold text-blue-600 dark:text-blue-400">
-                                                        {formatCurrency(
-                                                            referral.commission
-                                                        )}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-center">
-                                                        <Badge
-                                                            variant={getStatusBadgeVariant(
-                                                                referral.status
+                                                        </td>
+                                                        <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                                                            {
+                                                                referral.partner_name
+                                                            }
+                                                        </td>
+                                                        <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                                                            {
+                                                                referral.service_type
+                                                            }
+                                                        </td>
+                                                        <td className="px-4 py-3 text-right text-sm font-medium text-slate-900 dark:text-white">
+                                                            {formatCurrency(
+                                                                referral.amount,
                                                             )}
-                                                        >
-                                                            {formatStatus(
-                                                                referral.status
+                                                        </td>
+                                                        <td className="px-4 py-3 text-right text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                                            {formatCurrency(
+                                                                referral.commission,
                                                             )}
-                                                        </Badge>
-                                                    </td>
-                                                    <td className="px-4 py-3 text-right text-sm text-slate-500 dark:text-slate-500">
-                                                        {formatDate(referral.created_at)}
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-center">
+                                                            <Badge
+                                                                variant={getStatusBadgeVariant(
+                                                                    referral.status,
+                                                                )}
+                                                            >
+                                                                {formatStatus(
+                                                                    referral.status,
+                                                                )}
+                                                            </Badge>
+                                                        </td>
+                                                        <td className="px-4 py-3 text-right text-sm text-slate-500 dark:text-slate-500">
+                                                            {formatDate(
+                                                                referral.created_at,
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ),
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -509,9 +535,13 @@ export default function ReferralsIndex({
                                     <CardContent className="p-4">
                                         <div className="flex items-start gap-3">
                                             <Checkbox
-                                                checked={selectedIds.includes(referral.id)}
+                                                checked={selectedIds.includes(
+                                                    referral.id,
+                                                )}
                                                 onCheckedChange={() =>
-                                                    handleToggleSelect(referral.id)
+                                                    handleToggleSelect(
+                                                        referral.id,
+                                                    )
                                                 }
                                                 className="mt-0.5"
                                             />
@@ -519,18 +549,25 @@ export default function ReferralsIndex({
                                                 <div className="flex items-start justify-between">
                                                     <div className="flex-1">
                                                         <p className="font-medium text-slate-900 dark:text-white">
-                                                            {referral.customer_name}
+                                                            {
+                                                                referral.customer_name
+                                                            }
                                                         </p>
                                                         <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-400">
-                                                            via {referral.partner_name}
+                                                            via{' '}
+                                                            {
+                                                                referral.partner_name
+                                                            }
                                                         </p>
                                                     </div>
                                                     <Badge
                                                         variant={getStatusBadgeVariant(
-                                                            referral.status
+                                                            referral.status,
                                                         )}
                                                     >
-                                                        {formatStatus(referral.status)}
+                                                        {formatStatus(
+                                                            referral.status,
+                                                        )}
                                                     </Badge>
                                                 </div>
                                                 <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
@@ -539,7 +576,9 @@ export default function ReferralsIndex({
                                                             Service
                                                         </p>
                                                         <p className="mt-0.5 font-medium text-slate-900 dark:text-white">
-                                                            {referral.service_type}
+                                                            {
+                                                                referral.service_type
+                                                            }
                                                         </p>
                                                     </div>
                                                     <div className="text-right">
@@ -548,7 +587,7 @@ export default function ReferralsIndex({
                                                         </p>
                                                         <p className="mt-0.5 font-semibold text-blue-600 dark:text-blue-400">
                                                             {formatCurrency(
-                                                                referral.commission
+                                                                referral.commission,
                                                             )}
                                                         </p>
                                                     </div>
@@ -556,10 +595,14 @@ export default function ReferralsIndex({
                                                 <div className="mt-2 flex items-center justify-between text-sm">
                                                     <span className="text-slate-500 dark:text-slate-500">
                                                         Total:{' '}
-                                                        {formatCurrency(referral.amount)}
+                                                        {formatCurrency(
+                                                            referral.amount,
+                                                        )}
                                                     </span>
                                                     <span className="text-slate-500 dark:text-slate-500">
-                                                        {formatDate(referral.created_at)}
+                                                        {formatDate(
+                                                            referral.created_at,
+                                                        )}
                                                     </span>
                                                 </div>
                                             </div>

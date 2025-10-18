@@ -22,8 +22,8 @@ import {
     MoreVerticalIcon,
     PhoneIcon,
     QrCodeIcon,
-    TrendingUpIcon,
     TrashIcon,
+    TrendingUpIcon,
     UserIcon,
     WalletIcon,
 } from 'lucide-react';
@@ -126,7 +126,7 @@ export default function PartnerShow({
      * Get status badge variant
      */
     const getStatusBadgeVariant = (
-        status: string
+        status: string,
     ): 'default' | 'secondary' | 'destructive' | 'outline' => {
         switch (status) {
             case 'paid':
@@ -173,7 +173,7 @@ export default function PartnerShow({
     const handleDelete = () => {
         if (
             confirm(
-                `Are you sure you want to delete ${partner.name}? This action cannot be undone.`
+                `Are you sure you want to delete ${partner.name}? This action cannot be undone.`,
             )
         ) {
             router.delete(`/partners/${partner.id}`, {
@@ -198,7 +198,7 @@ export default function PartnerShow({
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white md:text-3xl">
+                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl dark:text-white">
                                 {partner.name}
                             </h1>
                             <Badge variant="outline">{partner.type}</Badge>
@@ -373,7 +373,7 @@ export default function PartnerShow({
                             <StatCard
                                 title="Avg per Referral"
                                 value={formatCurrency(
-                                    stats.avg_commission_per_referral
+                                    stats.avg_commission_per_referral,
                                 )}
                                 icon={TrendingUpIcon}
                                 variant="green"
@@ -405,8 +405,8 @@ export default function PartnerShow({
                                             No referrals yet
                                         </h3>
                                         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                                            Referrals with this partner will appear
-                                            here
+                                            Referrals with this partner will
+                                            appear here
                                         </p>
                                     </div>
                                 ) : (
@@ -414,22 +414,22 @@ export default function PartnerShow({
                                         <table className="w-full">
                                             <thead className="bg-slate-50 dark:bg-slate-900">
                                                 <tr>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                    <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                         Customer
                                                     </th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                    <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                         Service
                                                     </th>
-                                                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                    <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                         Amount
                                                     </th>
-                                                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                    <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                         Commission
                                                     </th>
-                                                    <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                    <th className="px-4 py-3 text-center text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                         Status
                                                     </th>
-                                                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                    <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                                         Date
                                                     </th>
                                                 </tr>
@@ -441,33 +441,39 @@ export default function PartnerShow({
                                                         className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/50"
                                                     >
                                                         <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">
-                                                            {referral.customer_name}
+                                                            {
+                                                                referral.customer_name
+                                                            }
                                                         </td>
                                                         <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
-                                                            {referral.service_type}
+                                                            {
+                                                                referral.service_type
+                                                            }
                                                         </td>
                                                         <td className="px-4 py-3 text-right text-sm font-medium text-slate-900 dark:text-white">
                                                             {formatCurrency(
-                                                                referral.amount
+                                                                referral.amount,
                                                             )}
                                                         </td>
                                                         <td className="px-4 py-3 text-right text-sm font-semibold text-blue-600 dark:text-blue-400">
                                                             {formatCurrency(
-                                                                referral.commission
+                                                                referral.commission,
                                                             )}
                                                         </td>
                                                         <td className="px-4 py-3 text-center">
                                                             <Badge
                                                                 variant={getStatusBadgeVariant(
-                                                                    referral.status
+                                                                    referral.status,
                                                                 )}
                                                             >
-                                                                {referral.status}
+                                                                {
+                                                                    referral.status
+                                                                }
                                                             </Badge>
                                                         </td>
                                                         <td className="px-4 py-3 text-right text-sm text-slate-500 dark:text-slate-500">
                                                             {formatDate(
-                                                                referral.created_at
+                                                                referral.created_at,
                                                             )}
                                                         </td>
                                                     </tr>

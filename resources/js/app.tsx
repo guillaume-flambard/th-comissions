@@ -1,14 +1,14 @@
 import '../css/app.css';
 
+import { Capacitor } from '@capacitor/core';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { StatusBar } from '@capacitor/status-bar';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
-import { Capacitor } from '@capacitor/core';
-import { SplashScreen } from '@capacitor/splash-screen';
-import { StatusBar } from '@capacitor/status-bar';
-import { PushNotificationManager } from './lib/push-notifications';
 import { isMobileDevice } from './hooks/use-device';
+import { PushNotificationManager } from './lib/push-notifications';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Trackly';
 
@@ -51,7 +51,10 @@ createInertiaApp({
         }
 
         // Load regular version
-        return resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx'));
+        return resolvePageComponent(
+            `./pages/${name}.tsx`,
+            import.meta.glob('./pages/**/*.tsx'),
+        );
     },
     setup({ el, App, props }) {
         const root = createRoot(el);

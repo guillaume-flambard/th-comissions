@@ -1,4 +1,7 @@
-import { RecentReferralsTable, type Referral } from '@/components/recent-referrals-table';
+import {
+    RecentReferralsTable,
+    type Referral,
+} from '@/components/recent-referrals-table';
 import { StatCard } from '@/components/stat-card';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -123,11 +126,12 @@ export default function Dashboard({
             <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
                 {/* Welcome Section */}
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white md:text-3xl">
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl dark:text-white">
                         Dashboard
                     </h1>
                     <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                        Track your commission performance and manage your partner network
+                        Track your commission performance and manage your
+                        partner network
                     </p>
                 </div>
 
@@ -238,7 +242,8 @@ export default function Dashboard({
                                             No partners yet
                                         </h3>
                                         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                                            Add your first partner to start tracking commissions
+                                            Add your first partner to start
+                                            tracking commissions
                                         </p>
                                         <Button
                                             className="mt-4"
@@ -268,7 +273,8 @@ export default function Dashboard({
                                                     <p className="text-sm text-slate-500 dark:text-slate-500">
                                                         {partner.type} •{' '}
                                                         {partner.referral_count}{' '}
-                                                        {partner.referral_count === 1
+                                                        {partner.referral_count ===
+                                                        1
                                                             ? 'referral'
                                                             : 'referrals'}
                                                     </p>
@@ -278,7 +284,7 @@ export default function Dashboard({
                                                 <div className="text-right">
                                                     <p className="font-semibold text-blue-600 dark:text-blue-400">
                                                         {formatCurrency(
-                                                            partner.total_commission
+                                                            partner.total_commission,
                                                         )}
                                                     </p>
                                                 </div>

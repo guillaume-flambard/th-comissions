@@ -1,7 +1,11 @@
-import { Head, useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -12,7 +16,16 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, MapPin, Users, DollarSign, Package, Mail, Phone } from 'lucide-react';
+import { Head, useForm } from '@inertiajs/react';
+import {
+    Calendar,
+    DollarSign,
+    Mail,
+    Package,
+    Phone,
+    Users,
+} from 'lucide-react';
+import { FormEvent } from 'react';
 
 interface Partner {
     id: number;
@@ -58,8 +71,26 @@ export default function BookingCreate({ partner, utm_params }: Props) {
     ];
 
     const countries = [
-        'US', 'GB', 'AU', 'DE', 'FR', 'ES', 'IT', 'JP', 'KR', 'CN',
-        'SG', 'MY', 'TH', 'IN', 'CA', 'BR', 'MX', 'NL', 'SE', 'NO',
+        'US',
+        'GB',
+        'AU',
+        'DE',
+        'FR',
+        'ES',
+        'IT',
+        'JP',
+        'KR',
+        'CN',
+        'SG',
+        'MY',
+        'TH',
+        'IN',
+        'CA',
+        'BR',
+        'MX',
+        'NL',
+        'SE',
+        'NO',
     ];
 
     const handleSubmit = (e: FormEvent) => {
@@ -87,7 +118,8 @@ export default function BookingCreate({ partner, utm_params }: Props) {
                         {partner && (
                             <div className="mt-4 rounded-lg bg-blue-100 p-4 dark:bg-blue-900">
                                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                                    Referred by <strong>{partner.business_name}</strong>
+                                    Referred by{' '}
+                                    <strong>{partner.business_name}</strong>
                                 </p>
                             </div>
                         )}
@@ -98,9 +130,12 @@ export default function BookingCreate({ partner, utm_params }: Props) {
 
                     <Card className="border-0 shadow-2xl">
                         <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                            <CardTitle className="text-2xl">Booking Details</CardTitle>
+                            <CardTitle className="text-2xl">
+                                Booking Details
+                            </CardTitle>
                             <CardDescription className="text-white/80">
-                                Please provide accurate information for your booking
+                                Please provide accurate information for your
+                                booking
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="pt-8">
@@ -117,83 +152,127 @@ export default function BookingCreate({ partner, utm_params }: Props) {
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div>
                                             <Label htmlFor="customer_name">
-                                                Full Name <span className="text-red-500">*</span>
+                                                Full Name{' '}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </Label>
                                             <Input
                                                 id="customer_name"
                                                 type="text"
                                                 value={data.customer_name}
-                                                onChange={(e) => setData('customer_name', e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'customer_name',
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 placeholder="John Doe"
                                                 className="mt-1"
                                                 required
                                             />
                                             {errors.customer_name && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.customer_name}</p>
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {errors.customer_name}
+                                                </p>
                                             )}
                                         </div>
 
                                         <div>
                                             <Label htmlFor="customer_country">
-                                                Country <span className="text-red-500">*</span>
+                                                Country{' '}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </Label>
                                             <Select
                                                 value={data.customer_country}
-                                                onValueChange={(value) => setData('customer_country', value)}
+                                                onValueChange={(value) =>
+                                                    setData(
+                                                        'customer_country',
+                                                        value,
+                                                    )
+                                                }
                                                 required
                                             >
                                                 <SelectTrigger className="mt-1">
                                                     <SelectValue placeholder="Select country" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {countries.map((country) => (
-                                                        <SelectItem key={country} value={country}>
-                                                            {country}
-                                                        </SelectItem>
-                                                    ))}
+                                                    {countries.map(
+                                                        (country) => (
+                                                            <SelectItem
+                                                                key={country}
+                                                                value={country}
+                                                            >
+                                                                {country}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             {errors.customer_country && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.customer_country}</p>
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {errors.customer_country}
+                                                </p>
                                             )}
                                         </div>
 
                                         <div>
                                             <Label htmlFor="customer_email">
-                                                Email <span className="text-red-500">*</span>
+                                                Email{' '}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </Label>
                                             <div className="relative mt-1">
-                                                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                                <Mail className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                                 <Input
                                                     id="customer_email"
                                                     type="email"
                                                     value={data.customer_email}
-                                                    onChange={(e) => setData('customer_email', e.target.value)}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            'customer_email',
+                                                            e.target.value,
+                                                        )
+                                                    }
                                                     placeholder="john@example.com"
                                                     className="pl-10"
                                                     required
                                                 />
                                             </div>
                                             {errors.customer_email && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.customer_email}</p>
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {errors.customer_email}
+                                                </p>
                                             )}
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="customer_phone">Phone</Label>
+                                            <Label htmlFor="customer_phone">
+                                                Phone
+                                            </Label>
                                             <div className="relative mt-1">
-                                                <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                                <Phone className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                                 <Input
                                                     id="customer_phone"
                                                     type="tel"
                                                     value={data.customer_phone}
-                                                    onChange={(e) => setData('customer_phone', e.target.value)}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            'customer_phone',
+                                                            e.target.value,
+                                                        )
+                                                    }
                                                     placeholder="+66 XX XXX XXXX"
                                                     className="pl-10"
                                                 />
                                             </div>
                                             {errors.customer_phone && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.customer_phone}</p>
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {errors.customer_phone}
+                                                </p>
                                             )}
                                         </div>
                                     </div>
@@ -211,97 +290,158 @@ export default function BookingCreate({ partner, utm_params }: Props) {
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div>
                                             <Label htmlFor="service_type">
-                                                Service Type <span className="text-red-500">*</span>
+                                                Service Type{' '}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </Label>
                                             <Select
                                                 value={data.service_type}
-                                                onValueChange={(value) => setData('service_type', value)}
+                                                onValueChange={(value) =>
+                                                    setData(
+                                                        'service_type',
+                                                        value,
+                                                    )
+                                                }
                                                 required
                                             >
                                                 <SelectTrigger className="mt-1">
                                                     <SelectValue placeholder="Select service type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {serviceTypes.map((type) => (
-                                                        <SelectItem key={type.value} value={type.value}>
-                                                            {type.label}
-                                                        </SelectItem>
-                                                    ))}
+                                                    {serviceTypes.map(
+                                                        (type) => (
+                                                            <SelectItem
+                                                                key={type.value}
+                                                                value={
+                                                                    type.value
+                                                                }
+                                                            >
+                                                                {type.label}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             {errors.service_type && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.service_type}</p>
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {errors.service_type}
+                                                </p>
                                             )}
                                         </div>
 
                                         <div>
                                             <Label htmlFor="service_name">
-                                                Service Name <span className="text-red-500">*</span>
+                                                Service Name{' '}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </Label>
                                             <Input
                                                 id="service_name"
                                                 type="text"
                                                 value={data.service_name}
-                                                onChange={(e) => setData('service_name', e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'service_name',
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 placeholder="e.g., Open Water Course"
                                                 className="mt-1"
                                                 required
                                             />
                                             {errors.service_name && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.service_name}</p>
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {errors.service_name}
+                                                </p>
                                             )}
                                         </div>
 
                                         <div>
                                             <Label htmlFor="service_date">
-                                                Service Date <span className="text-red-500">*</span>
+                                                Service Date{' '}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </Label>
                                             <div className="relative mt-1">
-                                                <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                                <Calendar className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                                 <Input
                                                     id="service_date"
                                                     type="date"
                                                     value={data.service_date}
-                                                    onChange={(e) => setData('service_date', e.target.value)}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            'service_date',
+                                                            e.target.value,
+                                                        )
+                                                    }
                                                     className="pl-10"
                                                     required
-                                                    min={new Date().toISOString().split('T')[0]}
+                                                    min={
+                                                        new Date()
+                                                            .toISOString()
+                                                            .split('T')[0]
+                                                    }
                                                 />
                                             </div>
                                             {errors.service_date && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.service_date}</p>
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {errors.service_date}
+                                                </p>
                                             )}
                                         </div>
 
                                         <div>
                                             <Label htmlFor="quantity">
-                                                Quantity <span className="text-red-500">*</span>
+                                                Quantity{' '}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </Label>
                                             <Input
                                                 id="quantity"
                                                 type="number"
                                                 value={data.quantity}
-                                                onChange={(e) => setData('quantity', parseInt(e.target.value))}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'quantity',
+                                                        parseInt(
+                                                            e.target.value,
+                                                        ),
+                                                    )
+                                                }
                                                 min="1"
                                                 className="mt-1"
                                                 required
                                             />
                                             {errors.quantity && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {errors.quantity}
+                                                </p>
                                             )}
                                         </div>
 
                                         <div className="md:col-span-2">
                                             <Label htmlFor="amount">
-                                                Total Amount (THB) <span className="text-red-500">*</span>
+                                                Total Amount (THB){' '}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </Label>
                                             <div className="relative mt-1">
-                                                <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                                <DollarSign className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                                 <Input
                                                     id="amount"
                                                     type="number"
                                                     value={data.amount}
-                                                    onChange={(e) => setData('amount', e.target.value)}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            'amount',
+                                                            e.target.value,
+                                                        )
+                                                    }
                                                     placeholder="0.00"
                                                     step="0.01"
                                                     min="0"
@@ -310,7 +450,9 @@ export default function BookingCreate({ partner, utm_params }: Props) {
                                                 />
                                             </div>
                                             {errors.amount && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {errors.amount}
+                                                </p>
                                             )}
                                         </div>
                                     </div>
@@ -318,16 +460,22 @@ export default function BookingCreate({ partner, utm_params }: Props) {
 
                                 {/* Additional Notes */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="notes">Additional Notes</Label>
+                                    <Label htmlFor="notes">
+                                        Additional Notes
+                                    </Label>
                                     <Textarea
                                         id="notes"
                                         value={data.notes}
-                                        onChange={(e) => setData('notes', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('notes', e.target.value)
+                                        }
                                         placeholder="Any special requests or additional information..."
                                         rows={4}
                                     />
                                     {errors.notes && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.notes}</p>
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {errors.notes}
+                                        </p>
                                     )}
                                 </div>
 
@@ -345,7 +493,9 @@ export default function BookingCreate({ partner, utm_params }: Props) {
                                         disabled={processing}
                                         className="bg-gradient-to-r from-blue-500 to-purple-500 px-8"
                                     >
-                                        {processing ? 'Creating Booking...' : 'Create Booking'}
+                                        {processing
+                                            ? 'Creating Booking...'
+                                            : 'Create Booking'}
                                     </Button>
                                 </div>
                             </form>
@@ -360,11 +510,13 @@ export default function BookingCreate({ partner, utm_params }: Props) {
                         <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                             <li className="flex items-start gap-2">
                                 <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-blue-500" />
-                                You will receive a confirmation email with your booking reference
+                                You will receive a confirmation email with your
+                                booking reference
                             </li>
                             <li className="flex items-start gap-2">
                                 <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-blue-500" />
-                                Our team will review and confirm your booking within 24 hours
+                                Our team will review and confirm your booking
+                                within 24 hours
                             </li>
                             <li className="flex items-start gap-2">
                                 <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-blue-500" />

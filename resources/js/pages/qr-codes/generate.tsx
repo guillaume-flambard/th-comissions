@@ -12,14 +12,8 @@ import {
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react';
-import {
-    CopyIcon,
-    DownloadIcon,
-    MailIcon,
-    QrCodeIcon,
-    RefreshCwIcon,
-} from 'lucide-react';
+import { Head, useForm } from '@inertiajs/react';
+import { CopyIcon, DownloadIcon, MailIcon, QrCodeIcon } from 'lucide-react';
 import { type FormEvent, useEffect, useState } from 'react';
 
 /**
@@ -113,7 +107,7 @@ export default function QRCodeGenerate({
 
     // Find selected partner
     const selectedPartner = partners.find(
-        (p) => p.id === Number(data.partner_id)
+        (p) => p.id === Number(data.partner_id),
     );
 
     /**
@@ -169,10 +163,10 @@ export default function QRCodeGenerate({
         if (!generatedLink || !selectedPartner) return;
 
         const subject = encodeURIComponent(
-            `Referral Link for ${selectedPartner.name}`
+            `Referral Link for ${selectedPartner.name}`,
         );
         const body = encodeURIComponent(
-            `Hi,\n\nHere's your referral tracking link for ${selectedPartner.name}:\n\n${generatedLink}\n\nShare this with customers to track commissions automatically.\n\nBest regards,\nTrackly`
+            `Hi,\n\nHere's your referral tracking link for ${selectedPartner.name}:\n\n${generatedLink}\n\nShare this with customers to track commissions automatically.\n\nBest regards,\nTrackly`,
         );
 
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
@@ -195,7 +189,7 @@ export default function QRCodeGenerate({
             <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white md:text-3xl">
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl dark:text-white">
                         Generate QR Code
                     </h1>
                     <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
@@ -216,12 +210,17 @@ export default function QRCodeGenerate({
                                     <div className="space-y-2">
                                         <Label htmlFor="partner_id">
                                             Select Partner{' '}
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </Label>
                                         <Select
                                             value={data.partner_id.toString()}
                                             onValueChange={(value) =>
-                                                setData('partner_id', Number(value))
+                                                setData(
+                                                    'partner_id',
+                                                    Number(value),
+                                                )
                                             }
                                             required
                                         >
@@ -234,14 +233,15 @@ export default function QRCodeGenerate({
                                                         key={partner.id}
                                                         value={partner.id.toString()}
                                                     >
-                                                        {partner.name} ({partner.type})
+                                                        {partner.name} (
+                                                        {partner.type})
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
                                         <p className="text-sm text-slate-500 dark:text-slate-500">
-                                            QR code will track referrals from this
-                                            partner
+                                            QR code will track referrals from
+                                            this partner
                                         </p>
                                     </div>
 
@@ -256,18 +256,23 @@ export default function QRCodeGenerate({
                                             placeholder="e.g., Summer-2025"
                                             value={data.campaign_name}
                                             onChange={(e) =>
-                                                setData('campaign_name', e.target.value)
+                                                setData(
+                                                    'campaign_name',
+                                                    e.target.value,
+                                                )
                                             }
                                         />
                                         <p className="text-sm text-slate-500 dark:text-slate-500">
-                                            Add a campaign identifier for tracking
-                                            different promotions
+                                            Add a campaign identifier for
+                                            tracking different promotions
                                         </p>
                                     </div>
 
                                     {/* QR Size */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="size">QR Code Size</Label>
+                                        <Label htmlFor="size">
+                                            QR Code Size
+                                        </Label>
                                         <Select
                                             value={data.size}
                                             onValueChange={(value) =>
@@ -292,7 +297,9 @@ export default function QRCodeGenerate({
 
                                     {/* QR Format */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="format">File Format</Label>
+                                        <Label htmlFor="format">
+                                            File Format
+                                        </Label>
                                         <Select
                                             value={data.format}
                                             onValueChange={(value) =>
@@ -319,7 +326,9 @@ export default function QRCodeGenerate({
                                     <Button
                                         type="submit"
                                         className="w-full"
-                                        disabled={processing || !data.partner_id}
+                                        disabled={
+                                            processing || !data.partner_id
+                                        }
                                     >
                                         <QrCodeIcon className="mr-2 size-5" />
                                         {processing
@@ -356,7 +365,8 @@ export default function QRCodeGenerate({
                                             </p>
                                             {data.campaign_name && (
                                                 <p className="mt-1 text-center text-xs text-slate-500 dark:text-slate-500">
-                                                    Campaign: {data.campaign_name}
+                                                    Campaign:{' '}
+                                                    {data.campaign_name}
                                                 </p>
                                             )}
                                         </div>
@@ -384,7 +394,8 @@ export default function QRCodeGenerate({
                                                 </div>
                                                 {copied && (
                                                     <p className="mt-2 text-xs text-green-600 dark:text-green-400">
-                                                        Link copied to clipboard!
+                                                        Link copied to
+                                                        clipboard!
                                                     </p>
                                                 )}
                                             </div>
@@ -417,17 +428,21 @@ export default function QRCodeGenerate({
                                             </h4>
                                             <ul className="mt-2 space-y-1 text-sm text-blue-800 dark:text-blue-300">
                                                 <li>
-                                                    • Share with {selectedPartner.name}{' '}
-                                                    to display at their location
+                                                    • Share with{' '}
+                                                    {selectedPartner.name} to
+                                                    display at their location
                                                 </li>
                                                 <li>
-                                                    • Customers scan to book and get
-                                                    tracked automatically
+                                                    • Customers scan to book and
+                                                    get tracked automatically
                                                 </li>
                                                 <li>
-                                                    • Commissions are calculated based on
-                                                    {selectedPartner.commission_rate}%
-                                                    rate
+                                                    • Commissions are calculated
+                                                    based on
+                                                    {
+                                                        selectedPartner.commission_rate
+                                                    }
+                                                    % rate
                                                 </li>
                                                 <li>
                                                     • Track all referrals in the
@@ -446,8 +461,9 @@ export default function QRCodeGenerate({
                                             No QR Code Generated
                                         </h3>
                                         <p className="mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-                                            Select a partner and click "Generate QR
-                                            Code" to create a trackable referral link
+                                            Select a partner and click "Generate
+                                            QR Code" to create a trackable
+                                            referral link
                                         </p>
                                     </div>
                                 )}

@@ -1,3 +1,7 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -23,14 +27,66 @@ import {
     X,
     Zap,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import {
+    motion,
+    useMotionValue,
+    useTransform,
+    animate,
+    type Variants,
+} from 'framer-motion';
+
+// Animation variants
+const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+};
+
+const fadeIn: Variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+};
+
+const scaleIn: Variants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1 },
+};
+
+const slideInLeft: Variants = {
+    hidden: { opacity: 0, x: -30 },
+    visible: { opacity: 1, x: 0 },
+};
+
+const slideInRight: Variants = {
+    hidden: { opacity: 0, x: 30 },
+    visible: { opacity: 1, x: 0 },
+};
+
+const staggerContainer: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const staggerFastContainer: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.05,
+        },
+    },
+};
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
+    const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     return (
         <>
@@ -91,69 +147,138 @@ export default function Welcome() {
                 <main className="pt-16">
                     {/* Hero Section - Gradient background with compelling copy */}
                     <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
-                        {/* Decorative gradient orbs */}
-                        <div className="absolute left-1/4 top-20 size-96 rounded-full bg-blue-400/20 blur-3xl dark:bg-blue-600/10" />
-                        <div className="absolute right-1/4 top-40 size-96 rounded-full bg-orange-400/20 blur-3xl dark:bg-orange-600/10" />
+                        {/* Decorative gradient orbs - Continuous floating animation */}
+                        <motion.div
+                            className="absolute top-20 left-1/4 size-96 rounded-full bg-blue-400/20 blur-3xl dark:bg-blue-600/10"
+                            animate={
+                                prefersReducedMotion
+                                    ? {}
+                                    : {
+                                          y: [0, -20, 0],
+                                          x: [0, 10, 0],
+                                      }
+                            }
+                            transition={{
+                                duration: 8,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                            }}
+                        />
+                        <motion.div
+                            className="absolute top-40 right-1/4 size-96 rounded-full bg-orange-400/20 blur-3xl dark:bg-orange-600/10"
+                            animate={
+                                prefersReducedMotion
+                                    ? {}
+                                    : {
+                                          y: [0, 20, 0],
+                                          x: [0, -15, 0],
+                                      }
+                            }
+                            transition={{
+                                duration: 10,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                            }}
+                        />
 
                         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-32 lg:px-8">
                             <div className="mx-auto max-w-4xl text-center">
                                 {/* Trust badge */}
-                                <Badge
-                                    variant="secondary"
-                                    className="mb-6 rounded-full px-4 py-2 text-sm shadow-sm"
+                                <motion.div
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={fadeIn}
+                                    transition={{ duration: 0.5 }}
                                 >
-                                    <BadgeCheck className="size-4 text-blue-600 dark:text-blue-400" />
-                                    <span className="font-medium">
-                                        Trusted by 50+ tourism businesses across
-                                        Thailand
-                                    </span>
-                                </Badge>
+                                    <Badge
+                                        variant="secondary"
+                                        className="mb-6 rounded-full px-4 py-2 text-sm shadow-sm"
+                                    >
+                                        <BadgeCheck className="size-4 text-blue-600 dark:text-blue-400" />
+                                        <span className="font-medium">
+                                            Trusted by 50+ tourism businesses
+                                            across Thailand
+                                        </span>
+                                    </Badge>
+                                </motion.div>
 
                                 {/* Main headline - Focus on PAIN point */}
-                                <h1 className="mb-6 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl dark:text-white">
+                                <motion.h1
+                                    className="mb-6 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl dark:text-white"
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={fadeUp}
+                                    transition={{ duration: 0.6, delay: 0.1 }}
+                                >
                                     Stop Losing Money on{' '}
                                     <span className="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-600">
                                         Manual Commission
                                     </span>{' '}
                                     Tracking
-                                </h1>
+                                </motion.h1>
 
                                 {/* Subheadline - Resonate with Thai tourism owners */}
-                                <p className="mx-auto mb-10 max-w-3xl text-lg leading-relaxed text-slate-600 sm:text-xl dark:text-slate-300">
+                                <motion.p
+                                    className="mx-auto mb-10 max-w-3xl text-lg leading-relaxed text-slate-600 sm:text-xl dark:text-slate-300"
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={fadeUp}
+                                    transition={{ duration: 0.6, delay: 0.2 }}
+                                >
                                     Your partners send you customers. You lose
                                     track of who sent who. Commissions get
                                     forgotten. Relationships suffer.{' '}
                                     <span className="font-semibold text-slate-900 dark:text-white">
                                         Trackly fixes this automatically.
                                     </span>
-                                </p>
+                                </motion.p>
 
                                 {/* CTAs - Clear hierarchy */}
-                                <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                                    <Button asChild size="lg" className="group">
-                                        <Link
-                                            href={register()}
-                                            className="h-14 rounded-xl px-8 text-base shadow-lg shadow-blue-600/20 transition-shadow hover:shadow-xl hover:shadow-blue-600/30"
+                                <motion.div
+                                    className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={staggerFastContainer}
+                                    transition={{ delay: 0.3 }}
+                                >
+                                    <motion.div variants={scaleIn}>
+                                        <Button
+                                            asChild
+                                            size="lg"
+                                            className="group"
                                         >
-                                            <span>Start Free Trial</span>
-                                            <Zap className="size-5 transition-transform group-hover:scale-110" />
-                                        </Link>
-                                    </Button>
-                                    <Button
-                                        asChild
-                                        size="lg"
-                                        variant="outline"
-                                        className="h-14 rounded-xl border-2 px-8 text-base"
-                                    >
-                                        <a href="#how-it-works">
-                                            <span>See How It Works</span>
-                                            <ChevronDown className="size-5" />
-                                        </a>
-                                    </Button>
-                                </div>
+                                            <Link
+                                                href={register()}
+                                                className="h-14 rounded-xl px-8 text-base shadow-lg shadow-blue-600/20 transition-shadow hover:shadow-xl hover:shadow-blue-600/30"
+                                            >
+                                                <span>Start Free Trial</span>
+                                                <Zap className="size-5 transition-transform group-hover:scale-110" />
+                                            </Link>
+                                        </Button>
+                                    </motion.div>
+                                    <motion.div variants={scaleIn}>
+                                        <Button
+                                            asChild
+                                            size="lg"
+                                            variant="outline"
+                                            className="h-14 rounded-xl border-2 px-8 text-base"
+                                        >
+                                            <a href="#how-it-works">
+                                                <span>See How It Works</span>
+                                                <ChevronDown className="size-5" />
+                                            </a>
+                                        </Button>
+                                    </motion.div>
+                                </motion.div>
 
                                 {/* Trust indicators */}
-                                <p className="mt-8 text-sm text-slate-500 dark:text-slate-400">
+                                <motion.p
+                                    className="mt-8 text-sm text-slate-500 dark:text-slate-400"
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={fadeIn}
+                                    transition={{ duration: 0.5, delay: 0.5 }}
+                                >
                                     <CheckCircle2 className="mr-1 inline size-4 text-green-600 dark:text-green-400" />
                                     No credit card required
                                     <span className="mx-3">•</span>
@@ -162,11 +287,17 @@ export default function Welcome() {
                                     <span className="mx-3">•</span>
                                     <CheckCircle2 className="mr-1 inline size-4 text-green-600 dark:text-green-400" />
                                     Cancel anytime
-                                </p>
+                                </motion.p>
                             </div>
 
                             {/* Visual mockup - Dashboard preview */}
-                            <div className="relative mx-auto mt-16 max-w-5xl">
+                            <motion.div
+                                className="relative mx-auto mt-16 max-w-5xl"
+                                initial="hidden"
+                                animate="visible"
+                                variants={fadeUp}
+                                transition={{ duration: 0.7, delay: 0.6 }}
+                            >
                                 <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-600/20 to-orange-600/20 blur-3xl" />
                                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900">
                                     {/* Browser chrome */}
@@ -177,9 +308,18 @@ export default function Welcome() {
                                     </div>
                                     {/* Mockup content */}
                                     <div className="aspect-video bg-gradient-to-br from-slate-50 to-slate-100 p-8 dark:from-slate-900 dark:to-slate-800">
-                                        <div className="grid h-full gap-4 sm:grid-cols-3">
-                                            {/* Stat card mockup */}
-                                            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+                                        <motion.div
+                                            className="grid h-full gap-4 sm:grid-cols-3"
+                                            variants={staggerContainer}
+                                            initial="hidden"
+                                            animate="visible"
+                                            transition={{ delay: 0.8 }}
+                                        >
+                                            {/* Stat card mockup 1 */}
+                                            <motion.div
+                                                className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                                                variants={scaleIn}
+                                            >
                                                 <div className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">
                                                     Total Commissions
                                                 </div>
@@ -189,8 +329,12 @@ export default function Welcome() {
                                                 <div className="mt-2 text-xs text-green-600 dark:text-green-400">
                                                     +12.5% this month
                                                 </div>
-                                            </div>
-                                            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+                                            </motion.div>
+                                            {/* Stat card mockup 2 */}
+                                            <motion.div
+                                                className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                                                variants={scaleIn}
+                                            >
                                                 <div className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">
                                                     Active Partners
                                                 </div>
@@ -200,8 +344,12 @@ export default function Welcome() {
                                                 <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                                                     8 new this week
                                                 </div>
-                                            </div>
-                                            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+                                            </motion.div>
+                                            {/* Stat card mockup 3 */}
+                                            <motion.div
+                                                className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                                                variants={scaleIn}
+                                            >
                                                 <div className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">
                                                     Referrals
                                                 </div>
@@ -211,56 +359,88 @@ export default function Welcome() {
                                                 <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                                                     This month
                                                 </div>
-                                            </div>
-                                        </div>
+                                            </motion.div>
+                                        </motion.div>
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         </div>
                     </section>
 
                     {/* Social Proof - Build trust early */}
                     <section className="border-y border-slate-200 bg-slate-50 py-12 dark:border-slate-800 dark:bg-slate-900/50">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                            <div className="grid gap-8 md:grid-cols-3">
+                            <motion.div
+                                className="grid gap-8 md:grid-cols-3"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={staggerContainer}
+                            >
                                 {/* Stat 1 */}
-                                <div className="text-center">
+                                <motion.div
+                                    className="text-center"
+                                    variants={fadeUp}
+                                >
                                     <div className="mb-2 text-4xl font-bold text-blue-600 dark:text-blue-400">
-                                        ฿2.5M+
+                                        <CountUp
+                                            end={2.5}
+                                            duration={2}
+                                            decimals={1}
+                                            suffix="M+"
+                                            prefix="฿"
+                                        />
                                     </div>
                                     <div className="text-sm font-medium text-slate-600 dark:text-slate-300">
                                         Commissions tracked
                                     </div>
-                                </div>
+                                </motion.div>
                                 {/* Stat 2 */}
-                                <div className="text-center">
+                                <motion.div
+                                    className="text-center"
+                                    variants={fadeUp}
+                                >
                                     <div className="mb-2 text-4xl font-bold text-orange-600 dark:text-orange-400">
-                                        500+
+                                        <CountUp
+                                            end={500}
+                                            duration={2}
+                                            suffix="+"
+                                        />
                                     </div>
                                     <div className="text-sm font-medium text-slate-600 dark:text-slate-300">
                                         Referrals processed monthly
                                     </div>
-                                </div>
+                                </motion.div>
                                 {/* Stat 3 */}
-                                <div className="text-center">
+                                <motion.div
+                                    className="text-center"
+                                    variants={fadeUp}
+                                >
                                     <div className="mb-2 text-4xl font-bold text-slate-900 dark:text-white">
-                                        10hrs
+                                        <CountUp
+                                            end={10}
+                                            duration={2}
+                                            suffix="hrs"
+                                        />
                                     </div>
                                     <div className="text-sm font-medium text-slate-600 dark:text-slate-300">
                                         Saved per business/month
                                     </div>
-                                </div>
-                            </div>
+                                </motion.div>
+                            </motion.div>
                         </div>
                     </section>
 
                     {/* Problem-Solution - Visual before/after */}
-                    <section
-                        id="how-it-works"
-                        className="py-20 sm:py-32"
-                    >
+                    <section id="how-it-works" className="py-20 sm:py-32">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                            <div className="mb-16 text-center">
+                            <motion.div
+                                className="mb-16 text-center"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={fadeUp}
+                            >
                                 <Badge
                                     variant="outline"
                                     className="mb-4 rounded-full px-4 py-2"
@@ -277,12 +457,19 @@ export default function Welcome() {
                                         Clear Tracking
                                     </span>
                                 </h2>
-                            </div>
+                            </motion.div>
 
-                            <div className="grid gap-8 lg:grid-cols-2">
+                            <motion.div
+                                className="grid gap-8 lg:grid-cols-2"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={staggerContainer}
+                            >
                                 {/* BEFORE - Manual tracking */}
-                                <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50/50 to-white dark:border-red-900/50 dark:from-red-950/20 dark:to-slate-900">
-                                    <CardContent className="p-8">
+                                <motion.div variants={slideInLeft}>
+                                    <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50/50 to-white dark:border-red-900/50 dark:from-red-950/20 dark:to-slate-900">
+                                        <CardContent className="p-8">
                                         <div className="mb-6 flex items-center gap-3">
                                             <div className="flex size-12 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/30">
                                                 <X className="size-6 text-red-600 dark:text-red-400" />
@@ -338,12 +525,14 @@ export default function Welcome() {
                                                 reconciling payments
                                             </ProblemItem>
                                         </ul>
-                                    </CardContent>
-                                </Card>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
 
                                 {/* AFTER - Trackly solution */}
-                                <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50/50 to-white shadow-lg shadow-green-600/10 dark:border-green-900/50 dark:from-green-950/20 dark:to-slate-900">
-                                    <CardContent className="p-8">
+                                <motion.div variants={slideInRight}>
+                                    <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50/50 to-white shadow-lg shadow-green-600/10 dark:border-green-900/50 dark:from-green-950/20 dark:to-slate-900">
+                                        <CardContent className="p-8">
                                         <div className="mb-6 flex items-center gap-3">
                                             <div className="flex size-12 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
                                                 <CheckCircle2 className="size-6 text-green-600 dark:text-green-400" />
@@ -371,8 +560,8 @@ export default function Welcome() {
                                                     <CheckCircle2 className="size-5 text-green-600 dark:text-green-400" />
                                                 }
                                             >
-                                                Auto-calculated commissions - zero
-                                                math errors
+                                                Auto-calculated commissions -
+                                                zero math errors
                                             </SolutionItem>
                                             <SolutionItem
                                                 icon={
@@ -394,20 +583,27 @@ export default function Welcome() {
                                                     <Zap className="size-5 text-green-600 dark:text-green-400" />
                                                 }
                                             >
-                                                10 minutes per month instead of 8+
-                                                hours
+                                                10 minutes per month instead of
+                                                8+ hours
                                             </SolutionItem>
                                         </ul>
-                                    </CardContent>
-                                </Card>
-                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            </motion.div>
                         </div>
                     </section>
 
                     {/* How It Works - 3 Simple Steps */}
-                    <section className="bg-slate-50 py-20 dark:bg-slate-900/50 sm:py-32">
+                    <section className="bg-slate-50 py-20 sm:py-32 dark:bg-slate-900/50">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                            <div className="mb-16 text-center">
+                            <motion.div
+                                className="mb-16 text-center"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={fadeUp}
+                            >
                                 <Badge
                                     variant="outline"
                                     className="mb-4 rounded-full px-4 py-2"
@@ -420,9 +616,15 @@ export default function Welcome() {
                                         3 Simple Steps
                                     </span>
                                 </h2>
-                            </div>
+                            </motion.div>
 
-                            <div className="grid gap-8 lg:grid-cols-3">
+                            <motion.div
+                                className="grid gap-8 lg:grid-cols-3"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={staggerContainer}
+                            >
                                 <StepCard
                                     number="01"
                                     icon={<Users className="size-8" />}
@@ -444,14 +646,20 @@ export default function Welcome() {
                                     description="Trackly calculates earnings. Pay partners via PromptPay in one click."
                                     color="green"
                                 />
-                            </div>
+                            </motion.div>
                         </div>
                     </section>
 
                     {/* Features - With icons and better hierarchy */}
                     <section id="features" className="py-20 sm:py-32">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                            <div className="mb-16 text-center">
+                            <motion.div
+                                className="mb-16 text-center"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={fadeUp}
+                            >
                                 <Badge
                                     variant="outline"
                                     className="mb-4 rounded-full px-4 py-2"
@@ -469,9 +677,15 @@ export default function Welcome() {
                                     sector with features that solve real
                                     problems.
                                 </p>
-                            </div>
+                            </motion.div>
 
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            <motion.div
+                                className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={staggerContainer}
+                            >
                                 <FeatureCard
                                     icon={
                                         <QrCode className="size-6 text-blue-600 dark:text-blue-400" />
@@ -514,14 +728,20 @@ export default function Welcome() {
                                     title="PMS Integration"
                                     description="Connect with STAAH, Cloudbeds, and more. Auto-validate bookings."
                                 />
-                            </div>
+                            </motion.div>
                         </div>
                     </section>
 
                     {/* Use Cases - Persona stories */}
-                    <section className="bg-gradient-to-br from-blue-50 via-white to-orange-50 py-20 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 sm:py-32">
+                    <section className="bg-gradient-to-br from-blue-50 via-white to-orange-50 py-20 sm:py-32 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                            <div className="mb-16 text-center">
+                            <motion.div
+                                className="mb-16 text-center"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={fadeUp}
+                            >
                                 <Badge
                                     variant="outline"
                                     className="mb-4 rounded-full px-4 py-2"
@@ -534,9 +754,15 @@ export default function Welcome() {
                                         Across Thailand
                                     </span>
                                 </h2>
-                            </div>
+                            </motion.div>
 
-                            <div className="grid gap-8 lg:grid-cols-2">
+                            <motion.div
+                                className="grid gap-8 lg:grid-cols-2"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={staggerContainer}
+                            >
                                 <TestimonialCard
                                     quote="I used to spend 2 hours every Friday reconciling commissions with 8 hostels. Now it takes 10 minutes. Trackly paid for itself in the first week."
                                     author="Som"
@@ -549,14 +775,20 @@ export default function Welcome() {
                                     role="Owner, Beachside Hostel"
                                     location="Phuket"
                                 />
-                            </div>
+                            </motion.div>
                         </div>
                     </section>
 
                     {/* Pricing Preview */}
                     <section id="pricing" className="py-20 sm:py-32">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                            <div className="mb-16 text-center">
+                            <motion.div
+                                className="mb-16 text-center"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={fadeUp}
+                            >
                                 <Badge
                                     variant="outline"
                                     className="mb-4 rounded-full px-4 py-2"
@@ -573,9 +805,15 @@ export default function Welcome() {
                                     Start free, upgrade as you grow. No hidden
                                     fees.
                                 </p>
-                            </div>
+                            </motion.div>
 
-                            <div className="grid gap-6 md:grid-cols-3">
+                            <motion.div
+                                className="grid gap-6 md:grid-cols-3"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: '-100px' }}
+                                variants={staggerContainer}
+                            >
                                 <PricingCard
                                     name="Free"
                                     price="0"
@@ -588,7 +826,7 @@ export default function Welcome() {
                                         'Basic reporting',
                                     ]}
                                     cta="Start Free"
-                                    ctaLink={register()}
+                                    ctaLink={register().url}
                                 />
                                 <PricingCard
                                     name="Starter"
@@ -603,7 +841,7 @@ export default function Welcome() {
                                         'Email support',
                                     ]}
                                     cta="Start Free Trial"
-                                    ctaLink={register()}
+                                    ctaLink={register().url}
                                     popular
                                 />
                                 <PricingCard
@@ -619,9 +857,9 @@ export default function Welcome() {
                                         'Custom commission rules',
                                     ]}
                                     cta="Start Free Trial"
-                                    ctaLink={register()}
+                                    ctaLink={register().url}
                                 />
-                            </div>
+                            </motion.div>
                         </div>
                     </section>
 
@@ -631,35 +869,101 @@ export default function Welcome() {
                     {/* Final CTA - Strong, urgent */}
                     <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-orange-600 py-20 sm:py-32">
                         {/* Decorative elements */}
-                        <div className="absolute left-0 top-0 size-96 rounded-full bg-white/10 blur-3xl" />
-                        <div className="absolute bottom-0 right-0 size-96 rounded-full bg-orange-500/20 blur-3xl" />
+                        <motion.div
+                            className="absolute top-0 left-0 size-96 rounded-full bg-white/10 blur-3xl"
+                            animate={
+                                prefersReducedMotion
+                                    ? {}
+                                    : {
+                                          scale: [1, 1.1, 1],
+                                          opacity: [0.1, 0.15, 0.1],
+                                      }
+                            }
+                            transition={{
+                                duration: 8,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                            }}
+                        />
+                        <motion.div
+                            className="absolute right-0 bottom-0 size-96 rounded-full bg-orange-500/20 blur-3xl"
+                            animate={
+                                prefersReducedMotion
+                                    ? {}
+                                    : {
+                                          scale: [1, 1.2, 1],
+                                          opacity: [0.2, 0.3, 0.2],
+                                      }
+                            }
+                            transition={{
+                                duration: 6,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                            }}
+                        />
 
                         <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-                            <h2 className="mb-6 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+                            <motion.h2
+                                className="mb-6 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                                variants={fadeUp}
+                            >
                                 Ready to Stop Losing Money on Manual Tracking?
-                            </h2>
-                            <p className="mx-auto mb-10 max-w-2xl text-lg text-blue-100 sm:text-xl">
+                            </motion.h2>
+                            <motion.p
+                                className="mx-auto mb-10 max-w-2xl text-lg text-blue-100 sm:text-xl"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                                variants={fadeUp}
+                                transition={{ delay: 0.1 }}
+                            >
                                 Join 50+ dive shops, hostels, and tour operators
                                 using Trackly. Start tracking commissions
                                 automatically in 5 minutes.
-                            </p>
+                            </motion.p>
 
-                            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                                <Button
-                                    asChild
-                                    size="lg"
-                                    className="group h-14 rounded-xl border-2 border-white bg-white px-8 text-base text-blue-700 shadow-xl hover:bg-blue-50"
+                            <motion.div
+                                className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                                variants={scaleIn}
+                                transition={{ delay: 0.2 }}
+                            >
+                                <motion.div
+                                    whileHover={
+                                        prefersReducedMotion ? {} : { scale: 1.05 }
+                                    }
+                                    whileTap={
+                                        prefersReducedMotion ? {} : { scale: 0.98 }
+                                    }
                                 >
-                                    <Link href={register()}>
-                                        <span className="font-semibold">
-                                            Start Free Trial
-                                        </span>
-                                        <Zap className="size-5 transition-transform group-hover:scale-110" />
-                                    </Link>
-                                </Button>
-                            </div>
+                                    <Button
+                                        asChild
+                                        size="lg"
+                                        className="group h-14 rounded-xl border-2 border-white bg-white px-8 text-base text-blue-700 shadow-xl hover:bg-blue-50"
+                                    >
+                                        <Link href={register()}>
+                                            <span className="font-semibold">
+                                                Start Free Trial
+                                            </span>
+                                            <Zap className="size-5 transition-transform group-hover:scale-110" />
+                                        </Link>
+                                    </Button>
+                                </motion.div>
+                            </motion.div>
 
-                            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-blue-100">
+                            <motion.div
+                                className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-blue-100"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                                variants={fadeIn}
+                                transition={{ delay: 0.3 }}
+                            >
                                 <span className="flex items-center gap-1.5">
                                     <CheckCircle2 className="size-4" />
                                     No credit card required
@@ -672,10 +976,17 @@ export default function Welcome() {
                                     <CheckCircle2 className="size-4" />
                                     Cancel anytime
                                 </span>
-                            </div>
+                            </motion.div>
 
                             {/* Sample QR code visualization */}
-                            <div className="mx-auto mt-12 max-w-sm">
+                            <motion.div
+                                className="mx-auto mt-12 max-w-sm"
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                                variants={scaleIn}
+                                transition={{ delay: 0.4 }}
+                            >
                                 <div className="rounded-2xl border-4 border-white/20 bg-white p-6 shadow-2xl">
                                     <div className="mb-3 text-center">
                                         <p className="text-sm font-semibold text-slate-900">
@@ -683,16 +994,30 @@ export default function Welcome() {
                                         </p>
                                     </div>
                                     {/* QR code placeholder */}
-                                    <div className="mx-auto flex aspect-square w-48 items-center justify-center rounded-lg bg-slate-100">
+                                    <motion.div
+                                        className="mx-auto flex aspect-square w-48 items-center justify-center rounded-lg bg-slate-100"
+                                        animate={
+                                            prefersReducedMotion
+                                                ? {}
+                                                : {
+                                                      rotate: [0, 5, -5, 0],
+                                                  }
+                                        }
+                                        transition={{
+                                            duration: 4,
+                                            repeat: Infinity,
+                                            ease: 'easeInOut',
+                                        }}
+                                    >
                                         <QrCode className="size-32 text-slate-400" />
-                                    </div>
+                                    </motion.div>
                                     <div className="mt-3 text-center">
                                         <p className="text-xs text-slate-600">
                                             Partners share this with customers
                                         </p>
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         </div>
                     </section>
                 </main>
@@ -813,12 +1138,12 @@ function ProblemItem({
     icon,
     children,
 }: {
-    icon: string;
+    icon: React.ReactNode;
     children: React.ReactNode;
 }) {
     return (
         <li className="flex gap-3">
-            <span className="text-xl">{icon}</span>
+            <span className="flex-shrink-0">{icon}</span>
             <span className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
                 {children}
             </span>
@@ -831,13 +1156,13 @@ function SolutionItem({
     icon,
     children,
 }: {
-    icon: string;
+    icon: React.ReactNode;
     children: React.ReactNode;
 }) {
     return (
         <li className="flex gap-3">
-            <span className="text-xl">{icon}</span>
-            <span className="text-sm font-medium leading-relaxed text-slate-900 dark:text-white">
+            <span className="flex-shrink-0">{icon}</span>
+            <span className="text-sm leading-relaxed font-medium text-slate-900 dark:text-white">
                 {children}
             </span>
         </li>
@@ -876,33 +1201,58 @@ function StepCard({
         green: 'text-green-600 dark:text-green-400',
     };
 
+    const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     return (
-        <Card
-            className={cn(
-                'border-2 bg-gradient-to-br shadow-sm',
-                colorClasses[color],
-            )}
-        >
-            <CardContent className="p-8">
-                <div className="mb-4 text-5xl font-bold opacity-20">
-                    <span className={numberColorClasses[color]}>{number}</span>
-                </div>
-                <div
+        <motion.div variants={fadeUp}>
+            <motion.div
+                whileHover={
+                    prefersReducedMotion
+                        ? {}
+                        : { y: -8, transition: { duration: 0.2 } }
+                }
+            >
+                <Card
                     className={cn(
-                        'mb-4 flex size-14 items-center justify-center rounded-xl',
-                        iconColorClasses[color],
+                        'border-2 bg-gradient-to-br shadow-sm transition-shadow hover:shadow-md',
+                        colorClasses[color],
                     )}
                 >
-                    {icon}
-                </div>
-                <h3 className="mb-3 text-xl font-bold text-slate-900 dark:text-white">
-                    {title}
-                </h3>
-                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                    {description}
-                </p>
-            </CardContent>
-        </Card>
+                    <CardContent className="p-8">
+                        <div className="mb-4 text-5xl font-bold opacity-20">
+                            <span className={numberColorClasses[color]}>
+                                {number}
+                            </span>
+                        </div>
+                        <motion.div
+                            className={cn(
+                                'mb-4 flex size-14 items-center justify-center rounded-xl',
+                                iconColorClasses[color],
+                            )}
+                            whileHover={
+                                prefersReducedMotion
+                                    ? {}
+                                    : {
+                                          scale: 1.1,
+                                          rotate: 5,
+                                          transition: { duration: 0.2 },
+                                      }
+                            }
+                        >
+                            {icon}
+                        </motion.div>
+                        <h3 className="mb-3 text-xl font-bold text-slate-900 dark:text-white">
+                            {title}
+                        </h3>
+                        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                            {description}
+                        </p>
+                    </CardContent>
+                </Card>
+            </motion.div>
+        </motion.div>
     );
 }
 
@@ -916,20 +1266,52 @@ function FeatureCard({
     title: string;
     description: string;
 }) {
+    const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     return (
-        <Card className="group transition-shadow hover:shadow-lg">
-            <CardContent className="p-6">
-                <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
-                    {icon}
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">
-                    {title}
-                </h3>
-                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                    {description}
-                </p>
-            </CardContent>
-        </Card>
+        <motion.div variants={fadeUp}>
+            <motion.div
+                whileHover={
+                    prefersReducedMotion
+                        ? {}
+                        : {
+                              y: -4,
+                              transition: {
+                                  type: 'spring',
+                                  stiffness: 300,
+                                  damping: 20,
+                              },
+                          }
+                }
+            >
+                <Card className="group h-full transition-shadow hover:shadow-lg">
+                    <CardContent className="p-6">
+                        <motion.div
+                            className="mb-4 flex size-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800"
+                            whileHover={
+                                prefersReducedMotion
+                                    ? {}
+                                    : {
+                                          rotate: 12,
+                                          scale: 1.1,
+                                          transition: { duration: 0.2 },
+                                      }
+                            }
+                        >
+                            {icon}
+                        </motion.div>
+                        <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">
+                            {title}
+                        </h3>
+                        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                            {description}
+                        </p>
+                    </CardContent>
+                </Card>
+            </motion.div>
+        </motion.div>
     );
 }
 
@@ -939,35 +1321,50 @@ function TestimonialCard({
     author,
     role,
     location,
-    avatar,
 }: {
     quote: string;
     author: string;
     role: string;
     location: string;
-    avatar: string;
 }) {
+    const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     return (
-        <Card className="border-2 shadow-lg">
-            <CardContent className="p-8">
-                <p className="mb-6 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
-                    "{quote}"
-                </p>
-                <div className="flex items-center gap-4">
-                    <div className="flex size-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-orange-100 text-2xl dark:from-blue-900/30 dark:to-orange-900/30">
-                        {avatar}
-                    </div>
-                    <div>
-                        <div className="font-semibold text-slate-900 dark:text-white">
-                            {author}
+        <motion.div variants={fadeUp}>
+            <Card className="border-2 shadow-lg">
+                <CardContent className="p-8">
+                    <p className="mb-6 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                        "{quote}"
+                    </p>
+                    <div className="flex items-center gap-4">
+                        <motion.div
+                            className="flex size-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-orange-100 dark:from-blue-900/30 dark:to-orange-900/30"
+                            initial={{ scale: 0 }}
+                            whileInView={{ scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{
+                                delay: 0.2,
+                                type: 'spring',
+                                stiffness: 260,
+                                damping: 20,
+                            }}
+                        >
+                            <User className="size-6 text-blue-600 dark:text-blue-400" />
+                        </motion.div>
+                        <div>
+                            <div className="font-semibold text-slate-900 dark:text-white">
+                                {author}
+                            </div>
+                            <div className="text-sm text-slate-600 dark:text-slate-400">
+                                {role} • {location}
+                            </div>
                         </div>
-                        <div className="text-sm text-slate-600 dark:text-slate-400">
-                            {role} • {location}
-                        </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+        </motion.div>
     );
 }
 
@@ -991,58 +1388,101 @@ function PricingCard({
     ctaLink: string;
     popular?: boolean;
 }) {
+    const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     return (
-        <Card
-            className={cn(
-                'relative border-2 shadow-sm transition-shadow hover:shadow-lg',
-                popular &&
-                    'border-blue-600 shadow-lg shadow-blue-600/10 dark:border-blue-400',
-            )}
-        >
-            {popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="rounded-full bg-gradient-to-r from-blue-600 to-orange-600 px-4 py-1 text-xs font-semibold text-white shadow-lg">
-                        Most Popular
-                    </Badge>
-                </div>
-            )}
-            <CardContent className="p-8">
-                <div className="mb-6">
-                    <h3 className="mb-2 text-xl font-bold text-slate-900 dark:text-white">
-                        {name}
-                    </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                        {description}
-                    </p>
-                </div>
-                <div className="mb-6">
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-bold text-slate-900 dark:text-white">
-                            ฿{price}
-                        </span>
-                        <span className="text-slate-600 dark:text-slate-400">
-                            /{period}
-                        </span>
-                    </div>
-                </div>
-                <Button asChild className="mb-6 w-full" size="lg">
-                    <Link href={ctaLink}>{cta}</Link>
-                </Button>
-                <ul className="space-y-3">
-                    {features.map((feature, index) => (
-                        <li
-                            key={index}
-                            className="flex items-start gap-2 text-sm"
+        <motion.div variants={fadeUp}>
+            <motion.div
+                whileHover={
+                    prefersReducedMotion
+                        ? {}
+                        : {
+                              y: -8,
+                              transition: {
+                                  type: 'spring',
+                                  stiffness: 300,
+                                  damping: 20,
+                              },
+                          }
+                }
+            >
+                <Card
+                    className={cn(
+                        'relative border-2 shadow-sm transition-shadow hover:shadow-lg',
+                        popular &&
+                            'border-blue-600 shadow-lg shadow-blue-600/10 dark:border-blue-400',
+                    )}
+                >
+                    {popular && (
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                            <motion.div
+                                animate={
+                                    prefersReducedMotion
+                                        ? {}
+                                        : {
+                                              scale: [1, 1.05, 1],
+                                          }
+                                }
+                                transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                }}
+                            >
+                                <Badge className="rounded-full bg-gradient-to-r from-blue-600 to-orange-600 px-4 py-1 text-xs font-semibold text-white shadow-lg">
+                                    Most Popular
+                                </Badge>
+                            </motion.div>
+                        </div>
+                    )}
+                    <CardContent className="p-8">
+                        <div className="mb-6">
+                            <h3 className="mb-2 text-xl font-bold text-slate-900 dark:text-white">
+                                {name}
+                            </h3>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                                {description}
+                            </p>
+                        </div>
+                        <div className="mb-6">
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-4xl font-bold text-slate-900 dark:text-white">
+                                    ฿{price}
+                                </span>
+                                <span className="text-slate-600 dark:text-slate-400">
+                                    /{period}
+                                </span>
+                            </div>
+                        </div>
+                        <Button asChild className="mb-6 w-full" size="lg">
+                            <Link href={ctaLink}>{cta}</Link>
+                        </Button>
+                        <motion.ul
+                            className="space-y-3"
+                            variants={staggerFastContainer}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
                         >
-                            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-green-600 dark:text-green-400" />
-                            <span className="text-slate-700 dark:text-slate-300">
-                                {feature}
-                            </span>
-                        </li>
-                    ))}
-                </ul>
-            </CardContent>
-        </Card>
+                            {features.map((feature, index) => (
+                                <motion.li
+                                    key={index}
+                                    className="flex items-start gap-2 text-sm"
+                                    variants={fadeIn}
+                                >
+                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-green-600 dark:text-green-400" />
+                                    <span className="text-slate-700 dark:text-slate-300">
+                                        {feature}
+                                    </span>
+                                </motion.li>
+                            ))}
+                        </motion.ul>
+                    </CardContent>
+                </Card>
+            </motion.div>
+        </motion.div>
     );
 }
 
@@ -1061,7 +1501,7 @@ function FAQSection() {
         },
         {
             question: "What if my partners don't want to use it?",
-            answer: 'Partners don\'t need to sign up or use any app. They simply share your unique QR code link with customers. When a customer books, you scan/click the code. That\'s it!',
+            answer: "Partners don't need to sign up or use any app. They simply share your unique QR code link with customers. When a customer books, you scan/click the code. That's it!",
         },
         {
             question: 'What about PromptPay fees?',
@@ -1078,9 +1518,18 @@ function FAQSection() {
     ];
 
     return (
-        <section id="faq" className="bg-slate-50 py-20 dark:bg-slate-900/50 sm:py-32">
+        <section
+            id="faq"
+            className="bg-slate-50 py-20 sm:py-32 dark:bg-slate-900/50"
+        >
             <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-                <div className="mb-16 text-center">
+                <motion.div
+                    className="mb-16 text-center"
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-100px' }}
+                    variants={fadeUp}
+                >
                     <Badge
                         variant="outline"
                         className="mb-4 rounded-full px-4 py-2"
@@ -1093,9 +1542,15 @@ function FAQSection() {
                             Questions
                         </span>
                     </h2>
-                </div>
+                </motion.div>
 
-                <div className="space-y-4">
+                <motion.div
+                    className="space-y-4"
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-100px' }}
+                    variants={staggerContainer}
+                >
                     {faqs.map((faq, index) => (
                         <FAQItem
                             key={index}
@@ -1107,7 +1562,7 @@ function FAQSection() {
                             }
                         />
                     ))}
-                </div>
+                </motion.div>
             </div>
         </section>
     );
@@ -1126,28 +1581,87 @@ function FAQItem({
     onClick: () => void;
 }) {
     return (
-        <Card className="overflow-hidden border-2 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
-            <button
-                onClick={onClick}
-                className="flex w-full items-center justify-between p-6 text-left"
-            >
-                <h3 className="pr-8 text-lg font-semibold text-slate-900 dark:text-white">
-                    {question}
-                </h3>
-                <ChevronDown
-                    className={cn(
-                        'size-5 shrink-0 text-slate-600 transition-transform dark:text-slate-400',
-                        isOpen && 'rotate-180',
-                    )}
-                />
-            </button>
-            {isOpen && (
-                <div className="border-t border-slate-200 px-6 pb-6 pt-4 dark:border-slate-800">
-                    <p className="leading-relaxed text-slate-600 dark:text-slate-300">
-                        {answer}
-                    </p>
-                </div>
-            )}
-        </Card>
+        <motion.div variants={fadeUp}>
+            <Card className="overflow-hidden border-2 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
+                <button
+                    onClick={onClick}
+                    className="flex w-full items-center justify-between p-6 text-left"
+                >
+                    <h3 className="pr-8 text-lg font-semibold text-slate-900 dark:text-white">
+                        {question}
+                    </h3>
+                    <motion.div
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
+                        <ChevronDown className="size-5 shrink-0 text-slate-600 dark:text-slate-400" />
+                    </motion.div>
+                </button>
+                <motion.div
+                    initial={false}
+                    animate={{
+                        height: isOpen ? 'auto' : 0,
+                        opacity: isOpen ? 1 : 0,
+                    }}
+                    transition={{
+                        height: { duration: 0.3, ease: 'easeInOut' },
+                        opacity: { duration: 0.2, ease: 'easeInOut' },
+                    }}
+                    className="overflow-hidden"
+                >
+                    <div className="border-t border-slate-200 px-6 pt-4 pb-6 dark:border-slate-800">
+                        <p className="leading-relaxed text-slate-600 dark:text-slate-300">
+                            {answer}
+                        </p>
+                    </div>
+                </motion.div>
+            </Card>
+        </motion.div>
+    );
+}
+
+// Component: Count Up Animation
+function CountUp({
+    end,
+    duration = 2,
+    decimals = 0,
+    prefix = '',
+    suffix = '',
+}: {
+    end: number;
+    duration?: number;
+    decimals?: number;
+    prefix?: string;
+    suffix?: string;
+}) {
+    const count = useMotionValue(0);
+    const [displayValue, setDisplayValue] = useState('0');
+
+    useEffect(() => {
+        const unsubscribe = count.on('change', (latest) => {
+            const value =
+                decimals > 0
+                    ? latest.toFixed(decimals)
+                    : Math.round(latest).toString();
+            setDisplayValue(value);
+        });
+
+        const controls = animate(count, end, {
+            duration,
+            ease: 'easeOut',
+        });
+
+        return () => {
+            unsubscribe();
+            controls.stop();
+        };
+    }, [count, end, duration, decimals]);
+
+    return (
+        <span>
+            {prefix}
+            {displayValue}
+            {suffix}
+        </span>
     );
 }

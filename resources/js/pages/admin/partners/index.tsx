@@ -1,7 +1,5 @@
-import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -10,18 +8,20 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Head, router } from '@inertiajs/react';
 import {
-    Users,
-    Search,
-    Filter,
-    Download,
-    Plus,
-    TrendingUp,
-    TrendingDown,
     Activity,
-    QrCode,
     AlertTriangle,
+    Download,
+    Filter,
+    Plus,
+    QrCode,
+    Search,
+    TrendingDown,
+    TrendingUp,
+    Users,
 } from 'lucide-react';
+import { useState } from 'react';
 
 interface PartnerTier {
     id: number;
@@ -71,7 +71,12 @@ interface Props {
     tiers: PartnerTier[];
 }
 
-export default function PartnersIndex({ partners, filters, businessTypes, tiers }: Props) {
+export default function PartnersIndex({
+    partners,
+    filters,
+    businessTypes,
+    tiers,
+}: Props) {
     const [search, setSearch] = useState(filters.search || '');
 
     const formatCurrency = (amount: number) => {
@@ -86,17 +91,19 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
         router.get(
             route('admin.partners.index'),
             { ...filters, [key]: value, page: 1 },
-            { preserveState: true, preserveScroll: true }
+            { preserveState: true, preserveScroll: true },
         );
     };
 
     const handleSort = (sortBy: string) => {
         const direction =
-            filters.sort_by === sortBy && filters.sort_direction === 'asc' ? 'desc' : 'asc';
+            filters.sort_by === sortBy && filters.sort_direction === 'asc'
+                ? 'desc'
+                : 'asc';
         router.get(
             route('admin.partners.index'),
             { ...filters, sort_by: sortBy, sort_direction: direction },
-            { preserveState: true, preserveScroll: true }
+            { preserveState: true, preserveScroll: true },
         );
     };
 
@@ -135,7 +142,9 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
             return (
                 <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
                     <TrendingUp className="h-4 w-4" />
-                    <span className="text-sm font-medium">{score.toFixed(0)}</span>
+                    <span className="text-sm font-medium">
+                        {score.toFixed(0)}
+                    </span>
                 </div>
             );
         }
@@ -143,7 +152,9 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
             return (
                 <div className="flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
                     <Activity className="h-4 w-4" />
-                    <span className="text-sm font-medium">{score.toFixed(0)}</span>
+                    <span className="text-sm font-medium">
+                        {score.toFixed(0)}
+                    </span>
                 </div>
             );
         }
@@ -169,18 +180,29 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                                 Partners Management
                             </h1>
                             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                {partners.total} partners " {partners.data.filter((p) => p.is_active).length} active
+                                {partners.total} partners "{' '}
+                                {
+                                    partners.data.filter((p) => p.is_active)
+                                        .length
+                                }{' '}
+                                active
                             </p>
                         </div>
                         <div className="flex gap-3">
                             <Button
                                 variant="outline"
-                                onClick={() => router.get(route('admin.partners.export'))}
+                                onClick={() =>
+                                    router.get(route('admin.partners.export'))
+                                }
                             >
                                 <Download className="mr-2 h-4 w-4" />
                                 Export CSV
                             </Button>
-                            <Button onClick={() => router.get(route('admin.partners.create'))}>
+                            <Button
+                                onClick={() =>
+                                    router.get(route('admin.partners.create'))
+                                }
+                            >
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add Partner
                             </Button>
@@ -192,14 +214,19 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                         <CardContent className="pt-6">
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
                                 {/* Search */}
-                                <form onSubmit={handleSearch} className="lg:col-span-2">
+                                <form
+                                    onSubmit={handleSearch}
+                                    className="lg:col-span-2"
+                                >
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                         <Input
                                             type="text"
                                             placeholder="Search partners..."
                                             value={search}
-                                            onChange={(e) => setSearch(e.target.value)}
+                                            onChange={(e) =>
+                                                setSearch(e.target.value)
+                                            }
                                             className="pl-10"
                                         />
                                     </div>
@@ -209,17 +236,24 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                                 <Select
                                     value={filters.business_type || 'all'}
                                     onValueChange={(value) =>
-                                        handleFilter('business_type', value === 'all' ? '' : value)
+                                        handleFilter(
+                                            'business_type',
+                                            value === 'all' ? '' : value,
+                                        )
                                     }
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Business Type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All Types</SelectItem>
+                                        <SelectItem value="all">
+                                            All Types
+                                        </SelectItem>
                                         {businessTypes.map((type) => (
                                             <SelectItem key={type} value={type}>
-                                                {type.replace('_', ' ').toUpperCase()}
+                                                {type
+                                                    .replace('_', ' ')
+                                                    .toUpperCase()}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -229,16 +263,24 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                                 <Select
                                     value={filters.tier || 'all'}
                                     onValueChange={(value) =>
-                                        handleFilter('tier', value === 'all' ? '' : value)
+                                        handleFilter(
+                                            'tier',
+                                            value === 'all' ? '' : value,
+                                        )
                                     }
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Partner Tier" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All Tiers</SelectItem>
+                                        <SelectItem value="all">
+                                            All Tiers
+                                        </SelectItem>
                                         {tiers.map((tier) => (
-                                            <SelectItem key={tier.id} value={tier.slug}>
+                                            <SelectItem
+                                                key={tier.id}
+                                                value={tier.slug}
+                                            >
                                                 {tier.name}
                                             </SelectItem>
                                         ))}
@@ -249,17 +291,28 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                                 <Select
                                     value={filters.status || 'all'}
                                     onValueChange={(value) =>
-                                        handleFilter('status', value === 'all' ? '' : value)
+                                        handleFilter(
+                                            'status',
+                                            value === 'all' ? '' : value,
+                                        )
                                     }
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All Status</SelectItem>
-                                        <SelectItem value="active">Active</SelectItem>
-                                        <SelectItem value="inactive">Inactive</SelectItem>
-                                        <SelectItem value="at_risk">At Risk</SelectItem>
+                                        <SelectItem value="all">
+                                            All Status
+                                        </SelectItem>
+                                        <SelectItem value="active">
+                                            Active
+                                        </SelectItem>
+                                        <SelectItem value="inactive">
+                                            Inactive
+                                        </SelectItem>
+                                        <SelectItem value="at_risk">
+                                            At Risk
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -279,24 +332,54 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                                 <table className="w-full text-sm">
                                     <thead className="border-b border-gray-200 dark:border-gray-700">
                                         <tr className="text-left text-gray-500 dark:text-gray-400">
-                                            <th className="pb-3 font-medium">Partner</th>
-                                            <th className="pb-3 font-medium">Tier</th>
-                                            <th
-                                                className="cursor-pointer pb-3 font-medium hover:text-gray-900 dark:hover:text-white"
-                                                onClick={() => handleSort('calculated_plv')}
-                                            >
-                                                PLV {filters.sort_by === 'calculated_plv' && (filters.sort_direction === 'asc' ? '‘' : '“')}
+                                            <th className="pb-3 font-medium">
+                                                Partner
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Tier
                                             </th>
                                             <th
                                                 className="cursor-pointer pb-3 font-medium hover:text-gray-900 dark:hover:text-white"
-                                                onClick={() => handleSort('total_revenue_generated')}
+                                                onClick={() =>
+                                                    handleSort('calculated_plv')
+                                                }
                                             >
-                                                Revenue {filters.sort_by === 'total_revenue_generated' && (filters.sort_direction === 'asc' ? '‘' : '“')}
+                                                PLV{' '}
+                                                {filters.sort_by ===
+                                                    'calculated_plv' &&
+                                                    (filters.sort_direction ===
+                                                    'asc'
+                                                        ? 'ï¿½'
+                                                        : 'ï¿½')}
                                             </th>
-                                            <th className="pb-3 font-medium">Conversions</th>
-                                            <th className="pb-3 font-medium">Engagement</th>
-                                            <th className="pb-3 font-medium">Status</th>
-                                            <th className="pb-3 font-medium">Actions</th>
+                                            <th
+                                                className="cursor-pointer pb-3 font-medium hover:text-gray-900 dark:hover:text-white"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        'total_revenue_generated',
+                                                    )
+                                                }
+                                            >
+                                                Revenue{' '}
+                                                {filters.sort_by ===
+                                                    'total_revenue_generated' &&
+                                                    (filters.sort_direction ===
+                                                    'asc'
+                                                        ? 'ï¿½'
+                                                        : 'ï¿½')}
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Conversions
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Engagement
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Status
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Actions
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -308,10 +391,16 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                                                 <td className="py-4">
                                                     <div>
                                                         <div className="font-medium text-gray-900 dark:text-white">
-                                                            {partner.business_name}
+                                                            {
+                                                                partner.business_name
+                                                            }
                                                         </div>
                                                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                            {partner.business_type.replace('_', ' ')} " {partner.city}
+                                                            {partner.business_type.replace(
+                                                                '_',
+                                                                ' ',
+                                                            )}{' '}
+                                                            " {partner.city}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -320,36 +409,59 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                                                         <span
                                                             className="rounded-full px-3 py-1 text-xs font-medium"
                                                             style={{
-                                                                backgroundColor: partner.tier.color + '20',
-                                                                color: partner.tier.color,
+                                                                backgroundColor:
+                                                                    partner.tier
+                                                                        .color +
+                                                                    '20',
+                                                                color: partner
+                                                                    .tier.color,
                                                             }}
                                                         >
                                                             {partner.tier.name}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-gray-400">-</span>
+                                                        <span className="text-gray-400">
+                                                            -
+                                                        </span>
                                                     )}
                                                 </td>
                                                 <td className="py-4 font-medium text-blue-600 dark:text-blue-400">
-                                                    {formatCurrency(partner.calculated_plv)}
+                                                    {formatCurrency(
+                                                        partner.calculated_plv,
+                                                    )}
                                                 </td>
                                                 <td className="py-4 font-medium text-green-600 dark:text-green-400">
-                                                    {formatCurrency(partner.total_revenue_generated)}
+                                                    {formatCurrency(
+                                                        partner.total_revenue_generated,
+                                                    )}
                                                 </td>
                                                 <td className="py-4">
                                                     <div>
                                                         <div className="font-medium text-gray-900 dark:text-white">
-                                                            {partner.successful_conversions}/{partner.total_referrals}
+                                                            {
+                                                                partner.successful_conversions
+                                                            }
+                                                            /
+                                                            {
+                                                                partner.total_referrals
+                                                            }
                                                         </div>
                                                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                            {partner.conversion_rate.toFixed(1)}%
+                                                            {partner.conversion_rate.toFixed(
+                                                                1,
+                                                            )}
+                                                            %
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="py-4">
-                                                    {getEngagementIndicator(partner.engagement_score)}
+                                                    {getEngagementIndicator(
+                                                        partner.engagement_score,
+                                                    )}
                                                 </td>
-                                                <td className="py-4">{getStatusBadge(partner)}</td>
+                                                <td className="py-4">
+                                                    {getStatusBadge(partner)}
+                                                </td>
                                                 <td className="py-4">
                                                     <div className="flex gap-2">
                                                         <Button
@@ -357,7 +469,10 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                                                             size="sm"
                                                             onClick={() =>
                                                                 router.get(
-                                                                    route('admin.partners.show', partner.id)
+                                                                    route(
+                                                                        'admin.partners.show',
+                                                                        partner.id,
+                                                                    ),
                                                                 )
                                                             }
                                                         >
@@ -368,7 +483,10 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                                                             size="sm"
                                                             onClick={() =>
                                                                 router.get(
-                                                                    route('admin.partners.qr', partner.id)
+                                                                    route(
+                                                                        'admin.partners.qr',
+                                                                        partner.id,
+                                                                    ),
                                                                 )
                                                             }
                                                         >
@@ -386,31 +504,48 @@ export default function PartnersIndex({ partners, filters, businessTypes, tiers 
                             {partners.last_page > 1 && (
                                 <div className="mt-6 flex items-center justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
                                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                                        Showing {(partners.current_page - 1) * partners.per_page + 1} to{' '}
-                                        {Math.min(partners.current_page * partners.per_page, partners.total)} of{' '}
-                                        {partners.total} partners
+                                        Showing{' '}
+                                        {(partners.current_page - 1) *
+                                            partners.per_page +
+                                            1}{' '}
+                                        to{' '}
+                                        {Math.min(
+                                            partners.current_page *
+                                                partners.per_page,
+                                            partners.total,
+                                        )}{' '}
+                                        of {partners.total} partners
                                     </div>
                                     <div className="flex gap-2">
-                                        {Array.from({ length: partners.last_page }, (_, i) => i + 1).map(
-                                            (page) => (
-                                                <Button
-                                                    key={page}
-                                                    variant={
-                                                        page === partners.current_page ? 'default' : 'outline'
-                                                    }
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        router.get(
-                                                            route('admin.partners.index'),
-                                                            { ...filters, page },
-                                                            { preserveState: true, preserveScroll: true }
-                                                        )
-                                                    }
-                                                >
-                                                    {page}
-                                                </Button>
-                                            )
-                                        )}
+                                        {Array.from(
+                                            { length: partners.last_page },
+                                            (_, i) => i + 1,
+                                        ).map((page) => (
+                                            <Button
+                                                key={page}
+                                                variant={
+                                                    page ===
+                                                    partners.current_page
+                                                        ? 'default'
+                                                        : 'outline'
+                                                }
+                                                size="sm"
+                                                onClick={() =>
+                                                    router.get(
+                                                        route(
+                                                            'admin.partners.index',
+                                                        ),
+                                                        { ...filters, page },
+                                                        {
+                                                            preserveState: true,
+                                                            preserveScroll: true,
+                                                        },
+                                                    )
+                                                }
+                                            >
+                                                {page}
+                                            </Button>
+                                        ))}
                                     </div>
                                 </div>
                             )}

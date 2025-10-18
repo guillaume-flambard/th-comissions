@@ -1,11 +1,17 @@
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { CapacitorUtils } from '@/lib/capacitor-utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Camera as CameraIcon, Keyboard, X } from 'lucide-react';
+import { CapacitorUtils } from '@/lib/capacitor-utils';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import jsQR from 'jsqr';
+import { Camera as CameraIcon, Keyboard, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface QRScannerProps {
@@ -15,7 +21,12 @@ interface QRScannerProps {
     description?: string;
 }
 
-export function QRScanner({ onScan, onClose, title, description }: QRScannerProps) {
+export function QRScanner({
+    onScan,
+    onClose,
+    title,
+    description,
+}: QRScannerProps) {
     const [manualCode, setManualCode] = useState('');
     const [scanning, setScanning] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -46,11 +57,15 @@ export function QRScanner({ onScan, onClose, title, description }: QRScannerProp
                 await CapacitorUtils.hapticImpact('medium');
                 onScan(qrCode);
             } else {
-                setError('No QR code found in image. Please try again or enter code manually.');
+                setError(
+                    'No QR code found in image. Please try again or enter code manually.',
+                );
             }
         } catch (err) {
             console.error('QR scan error:', err);
-            setError('Failed to scan QR code. Please try again or enter code manually.');
+            setError(
+                'Failed to scan QR code. Please try again or enter code manually.',
+            );
         } finally {
             setScanning(false);
         }
@@ -69,7 +84,7 @@ export function QRScanner({ onScan, onClose, title, description }: QRScannerProp
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute right-2 top-2 z-10"
+                    className="absolute top-2 right-2 z-10"
                     onClick={onClose}
                 >
                     <X className="h-4 w-4" />
@@ -82,7 +97,8 @@ export function QRScanner({ onScan, onClose, title, description }: QRScannerProp
                     {title || 'Scan QR Code'}
                 </CardTitle>
                 <CardDescription>
-                    {description || 'Use your camera to scan a partner QR code or enter it manually'}
+                    {description ||
+                        'Use your camera to scan a partner QR code or enter it manually'}
                 </CardDescription>
             </CardHeader>
 
@@ -115,13 +131,18 @@ export function QRScanner({ onScan, onClose, title, description }: QRScannerProp
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 border-t pt-4">
                         <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-                        <span className="text-xs text-gray-500 dark:text-gray-400">OR</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                            OR
+                        </span>
                         <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
                     </div>
 
                     <form onSubmit={handleManualSubmit} className="space-y-3">
                         <div>
-                            <Label htmlFor="manual-code" className="flex items-center gap-2">
+                            <Label
+                                htmlFor="manual-code"
+                                className="flex items-center gap-2"
+                            >
                                 <Keyboard className="h-4 w-4" />
                                 Enter Code Manually
                             </Label>
@@ -135,7 +156,12 @@ export function QRScanner({ onScan, onClose, title, description }: QRScannerProp
                             />
                         </div>
 
-                        <Button type="submit" variant="outline" className="w-full" disabled={!manualCode.trim()}>
+                        <Button
+                            type="submit"
+                            variant="outline"
+                            className="w-full"
+                            disabled={!manualCode.trim()}
+                        >
                             Submit Code
                         </Button>
                     </form>
@@ -144,7 +170,7 @@ export function QRScanner({ onScan, onClose, title, description }: QRScannerProp
                 {/* Help Text */}
                 <div className="rounded-lg bg-gray-50 p-4 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                     <p className="font-medium">Tips for scanning:</p>
-                    <ul className="ml-4 mt-2 list-disc space-y-1">
+                    <ul className="mt-2 ml-4 list-disc space-y-1">
                         <li>Ensure good lighting</li>
                         <li>Hold phone steady</li>
                         <li>Center QR code in frame</li>
@@ -174,9 +200,18 @@ async function decodeQRFromDataUrl(dataUrl: string): Promise<string | null> {
             }
 
             ctx.drawImage(img, 0, 0);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(
+                0,
+                0,
+                canvas.width,
+                canvas.height,
+            );
 
-            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            const code = jsQR(
+                imageData.data,
+                imageData.width,
+                imageData.height,
+            );
             resolve(code?.data || null);
         };
         img.onerror = () => resolve(null);

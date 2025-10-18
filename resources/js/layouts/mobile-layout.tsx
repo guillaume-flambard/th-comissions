@@ -1,14 +1,18 @@
 import { BottomNav } from '@/components/mobile/bottom-nav';
 import { useDevice } from '@/hooks/use-device';
-import { PropsWithChildren, useEffect } from 'react';
 import { CapacitorUtils } from '@/lib/capacitor-utils';
+import { PropsWithChildren, useEffect } from 'react';
 
 interface MobileLayoutProps extends PropsWithChildren {
     title?: string;
     showBottomNav?: boolean;
 }
 
-export default function MobileLayout({ children, title, showBottomNav = true }: MobileLayoutProps) {
+export default function MobileLayout({
+    children,
+    title,
+    showBottomNav = true,
+}: MobileLayoutProps) {
     const { isNative } = useDevice();
 
     useEffect(() => {
@@ -30,7 +34,14 @@ export default function MobileLayout({ children, title, showBottomNav = true }: 
             <div className="pt-safe" />
 
             {/* Main content area */}
-            <main className={cn('flex-1 overflow-y-auto', showBottomNav && 'pb-20')}>{children}</main>
+            <main
+                className={cn(
+                    'flex-1 overflow-y-auto',
+                    showBottomNav && 'pb-20',
+                )}
+            >
+                {children}
+            </main>
 
             {/* Bottom navigation */}
             {showBottomNav && <BottomNav />}

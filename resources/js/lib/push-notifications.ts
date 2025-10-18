@@ -1,5 +1,9 @@
-import { PushNotifications, Token, ActionPerformed } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
+import {
+    ActionPerformed,
+    PushNotifications,
+    Token,
+} from '@capacitor/push-notifications';
 
 export class PushNotificationManager {
     private static initialized = false;
@@ -9,7 +13,9 @@ export class PushNotificationManager {
      */
     static async initialize(): Promise<void> {
         if (!Capacitor.isNativePlatform()) {
-            console.log('Push notifications only available on native platforms');
+            console.log(
+                'Push notifications only available on native platforms',
+            );
             return;
         }
 
@@ -51,20 +57,29 @@ export class PushNotificationManager {
         });
 
         // Called when a push notification is received
-        PushNotifications.addListener('pushNotificationReceived', (notification) => {
-            console.log('Push notification received:', notification);
+        PushNotifications.addListener(
+            'pushNotificationReceived',
+            (notification) => {
+                console.log('Push notification received:', notification);
 
-            // You can show an in-app notification here
-            // Or update the app state based on the notification
-        });
+                // You can show an in-app notification here
+                // Or update the app state based on the notification
+            },
+        );
 
         // Called when user taps on a push notification
-        PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-            console.log('Push notification action performed:', notification);
+        PushNotifications.addListener(
+            'pushNotificationActionPerformed',
+            (notification: ActionPerformed) => {
+                console.log(
+                    'Push notification action performed:',
+                    notification,
+                );
 
-            // Handle notification tap - navigate to relevant screen
-            this.handleNotificationTap(notification);
-        });
+                // Handle notification tap - navigate to relevant screen
+                this.handleNotificationTap(notification);
+            },
+        );
     }
 
     /**
@@ -78,7 +93,10 @@ export class PushNotificationManager {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'X-CSRF-TOKEN':
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') || '',
                 },
                 body: JSON.stringify({
                     token,

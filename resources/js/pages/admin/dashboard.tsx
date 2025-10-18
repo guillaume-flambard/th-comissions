@@ -1,6 +1,13 @@
-import { Head } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowUpIcon, ArrowDownIcon, TrendingUpIcon, Users, DollarSign, ShoppingCart, AlertTriangle } from 'lucide-react';
+import { Head } from '@inertiajs/react';
+import {
+    AlertTriangle,
+    ArrowUpIcon,
+    DollarSign,
+    ShoppingCart,
+    TrendingUpIcon,
+    Users,
+} from 'lucide-react';
 
 interface Partner {
     id: number;
@@ -55,7 +62,11 @@ interface Props {
     topPartners: Partner[];
     atRiskPartners: AtRiskPartner[];
     recentBookings: Booking[];
-    revenueByServiceType: Array<{ service_type: string; total: number; count: number }>;
+    revenueByServiceType: Array<{
+        service_type: string;
+        total: number;
+        count: number;
+    }>;
 }
 
 export default function AdminDashboard({
@@ -79,12 +90,18 @@ export default function AdminDashboard({
 
     const getStatusColor = (status: string) => {
         const colors = {
-            completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-            confirmed: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-            pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-            cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+            completed:
+                'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+            confirmed:
+                'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+            pending:
+                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+            cancelled:
+                'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
         };
-        return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+        return (
+            colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+        );
     };
 
     return (
@@ -124,7 +141,9 @@ export default function AdminDashboard({
                                     <span className="font-medium text-green-600 dark:text-green-400">
                                         {formatCurrency(stats.month_revenue)}
                                     </span>
-                                    <span className="ml-1 text-gray-500 dark:text-gray-400">this month</span>
+                                    <span className="ml-1 text-gray-500 dark:text-gray-400">
+                                        this month
+                                    </span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -148,7 +167,9 @@ export default function AdminDashboard({
                                     <span className="font-medium text-purple-600 dark:text-purple-400">
                                         +{stats.month_new_partners}
                                     </span>
-                                    <span className="ml-1 text-gray-500 dark:text-gray-400">new this month</span>
+                                    <span className="ml-1 text-gray-500 dark:text-gray-400">
+                                        new this month
+                                    </span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -172,7 +193,9 @@ export default function AdminDashboard({
                                     <span className="font-medium text-green-600 dark:text-green-400">
                                         {stats.month_bookings}
                                     </span>
-                                    <span className="ml-1 text-gray-500 dark:text-gray-400">this month</span>
+                                    <span className="ml-1 text-gray-500 dark:text-gray-400">
+                                        this month
+                                    </span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -189,10 +212,15 @@ export default function AdminDashboard({
                             </CardHeader>
                             <CardContent className="pt-6">
                                 <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                                    {formatCurrency(stats.total_commissions_pending)}
+                                    {formatCurrency(
+                                        stats.total_commissions_pending,
+                                    )}
                                 </div>
                                 <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                    {formatCurrency(stats.total_commissions_paid)} paid
+                                    {formatCurrency(
+                                        stats.total_commissions_paid,
+                                    )}{' '}
+                                    paid
                                 </div>
                             </CardContent>
                         </Card>
@@ -223,32 +251,59 @@ export default function AdminDashboard({
                                                 <div className="flex-1">
                                                     <div className="flex items-center gap-2">
                                                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                                                            {partner.business_name}
+                                                            {
+                                                                partner.business_name
+                                                            }
                                                         </h3>
                                                         {partner.tier && (
                                                             <span
                                                                 className="rounded-full px-2 py-0.5 text-xs font-medium"
                                                                 style={{
-                                                                    backgroundColor: partner.tier.color + '20',
-                                                                    color: partner.tier.color,
+                                                                    backgroundColor:
+                                                                        partner
+                                                                            .tier
+                                                                            .color +
+                                                                        '20',
+                                                                    color: partner
+                                                                        .tier
+                                                                        .color,
                                                                 }}
                                                             >
-                                                                {partner.tier.name}
+                                                                {
+                                                                    partner.tier
+                                                                        .name
+                                                                }
                                                             </span>
                                                         )}
                                                     </div>
                                                     <div className="mt-1 flex gap-4 text-sm text-gray-600 dark:text-gray-400">
-                                                        <span>{partner.total_referrals} referrals</span>
-                                                        <span>{partner.conversion_rate.toFixed(1)}% conversion</span>
+                                                        <span>
+                                                            {
+                                                                partner.total_referrals
+                                                            }{' '}
+                                                            referrals
+                                                        </span>
+                                                        <span>
+                                                            {partner.conversion_rate.toFixed(
+                                                                1,
+                                                            )}
+                                                            % conversion
+                                                        </span>
                                                         <span className="font-medium text-green-600">
-                                                            {formatCurrency(partner.total_revenue)}
+                                                            {formatCurrency(
+                                                                partner.total_revenue,
+                                                            )}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">PLV</div>
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                        PLV
+                                                    </div>
                                                     <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                                                        {formatCurrency(partner.plv)}
+                                                        {formatCurrency(
+                                                            partner.plv,
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -267,37 +322,70 @@ export default function AdminDashboard({
                                         <table className="w-full text-sm">
                                             <thead className="border-b border-gray-200 dark:border-gray-700">
                                                 <tr className="text-left text-gray-500 dark:text-gray-400">
-                                                    <th className="pb-3 font-medium">Reference</th>
-                                                    <th className="pb-3 font-medium">Partner</th>
-                                                    <th className="pb-3 font-medium">Service</th>
-                                                    <th className="pb-3 font-medium">Amount</th>
-                                                    <th className="pb-3 font-medium">Commission</th>
-                                                    <th className="pb-3 font-medium">Status</th>
+                                                    <th className="pb-3 font-medium">
+                                                        Reference
+                                                    </th>
+                                                    <th className="pb-3 font-medium">
+                                                        Partner
+                                                    </th>
+                                                    <th className="pb-3 font-medium">
+                                                        Service
+                                                    </th>
+                                                    <th className="pb-3 font-medium">
+                                                        Amount
+                                                    </th>
+                                                    <th className="pb-3 font-medium">
+                                                        Commission
+                                                    </th>
+                                                    <th className="pb-3 font-medium">
+                                                        Status
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                                {recentBookings.map((booking) => (
-                                                    <tr key={booking.id} className="text-gray-900 dark:text-white">
-                                                        <td className="py-3 font-mono text-xs">
-                                                            {booking.booking_reference}
-                                                        </td>
-                                                        <td className="py-3">{booking.partner_name}</td>
-                                                        <td className="py-3">{booking.service_name}</td>
-                                                        <td className="py-3 font-medium">
-                                                            {formatCurrency(booking.amount)}
-                                                        </td>
-                                                        <td className="py-3 text-green-600">
-                                                            {formatCurrency(booking.commission_amount)}
-                                                        </td>
-                                                        <td className="py-3">
-                                                            <span
-                                                                className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(booking.status)}`}
-                                                            >
-                                                                {booking.status}
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                                {recentBookings.map(
+                                                    (booking) => (
+                                                        <tr
+                                                            key={booking.id}
+                                                            className="text-gray-900 dark:text-white"
+                                                        >
+                                                            <td className="py-3 font-mono text-xs">
+                                                                {
+                                                                    booking.booking_reference
+                                                                }
+                                                            </td>
+                                                            <td className="py-3">
+                                                                {
+                                                                    booking.partner_name
+                                                                }
+                                                            </td>
+                                                            <td className="py-3">
+                                                                {
+                                                                    booking.service_name
+                                                                }
+                                                            </td>
+                                                            <td className="py-3 font-medium">
+                                                                {formatCurrency(
+                                                                    booking.amount,
+                                                                )}
+                                                            </td>
+                                                            <td className="py-3 text-green-600">
+                                                                {formatCurrency(
+                                                                    booking.commission_amount,
+                                                                )}
+                                                            </td>
+                                                            <td className="py-3">
+                                                                <span
+                                                                    className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(booking.status)}`}
+                                                                >
+                                                                    {
+                                                                        booking.status
+                                                                    }
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ),
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
@@ -329,11 +417,16 @@ export default function AdminDashboard({
                                                     <span className="text-gray-600 dark:text-gray-400">
                                                         Last referral:{' '}
                                                         {partner.last_referral_at
-                                                            ? new Date(partner.last_referral_at).toLocaleDateString()
+                                                            ? new Date(
+                                                                  partner.last_referral_at,
+                                                              ).toLocaleDateString()
                                                             : 'Never'}
                                                     </span>
                                                     <span className="font-medium text-red-600 dark:text-red-400">
-                                                        {partner.churn_rate.toFixed(0)}% churn risk
+                                                        {partner.churn_rate.toFixed(
+                                                            0,
+                                                        )}
+                                                        % churn risk
                                                     </span>
                                                 </div>
                                             </div>
@@ -351,21 +444,29 @@ export default function AdminDashboard({
                                     <div className="space-y-3">
                                         {revenueByServiceType.map((service) => {
                                             const percentage =
-                                                (service.total / stats.total_revenue) * 100;
+                                                (service.total /
+                                                    stats.total_revenue) *
+                                                100;
                                             return (
                                                 <div key={service.service_type}>
                                                     <div className="mb-1 flex justify-between text-sm">
-                                                        <span className="capitalize text-gray-700 dark:text-gray-300">
-                                                            {service.service_type}
+                                                        <span className="text-gray-700 capitalize dark:text-gray-300">
+                                                            {
+                                                                service.service_type
+                                                            }
                                                         </span>
                                                         <span className="font-medium text-gray-900 dark:text-white">
-                                                            {formatCurrency(service.total)}
+                                                            {formatCurrency(
+                                                                service.total,
+                                                            )}
                                                         </span>
                                                     </div>
                                                     <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                                                         <div
                                                             className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
-                                                            style={{ width: `${percentage}%` }}
+                                                            style={{
+                                                                width: `${percentage}%`,
+                                                            }}
                                                         />
                                                     </div>
                                                     <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">

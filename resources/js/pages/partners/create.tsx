@@ -9,7 +9,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
@@ -102,7 +106,7 @@ export default function PartnerCreate() {
             <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white md:text-3xl">
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl dark:text-white">
                         Add New Partner
                     </h1>
                     <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
@@ -161,14 +165,19 @@ export default function PartnerCreate() {
                                         <SelectTrigger
                                             id="type"
                                             className={
-                                                errors.type ? 'border-red-500' : ''
+                                                errors.type
+                                                    ? 'border-red-500'
+                                                    : ''
                                             }
                                         >
                                             <SelectValue placeholder="Select business type" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {BUSINESS_TYPES.map((type) => (
-                                                <SelectItem key={type} value={type}>
+                                                <SelectItem
+                                                    key={type}
+                                                    value={type}
+                                                >
                                                     {type}
                                                 </SelectItem>
                                             ))}
@@ -192,7 +201,10 @@ export default function PartnerCreate() {
                                         placeholder="e.g., John Smith"
                                         value={data.contact_person}
                                         onChange={(e) =>
-                                            setData('contact_person', e.target.value)
+                                            setData(
+                                                'contact_person',
+                                                e.target.value,
+                                            )
                                         }
                                     />
                                 </div>
@@ -247,16 +259,20 @@ export default function PartnerCreate() {
 
                                 {/* PromptPay ID */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="promptpay_id" className="flex items-center gap-1.5">
+                                    <Label
+                                        htmlFor="promptpay_id"
+                                        className="flex items-center gap-1.5"
+                                    >
                                         PromptPay ID
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <InfoIcon className="size-4 text-slate-400 cursor-help" />
+                                                <InfoIcon className="size-4 cursor-help text-slate-400" />
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p className="max-w-xs">
-                                                    Thai mobile number or national ID
-                                                    linked to PromptPay for commission
+                                                    Thai mobile number or
+                                                    national ID linked to
+                                                    PromptPay for commission
                                                     payments
                                                 </p>
                                             </TooltipContent>
@@ -268,7 +284,10 @@ export default function PartnerCreate() {
                                         placeholder="e.g., 0812345678"
                                         value={data.promptpay_id}
                                         onChange={(e) =>
-                                            setData('promptpay_id', e.target.value)
+                                            setData(
+                                                'promptpay_id',
+                                                e.target.value,
+                                            )
                                         }
                                         className={
                                             errors.promptpay_id
@@ -300,7 +319,7 @@ export default function PartnerCreate() {
                                             onChange={(e) =>
                                                 setData(
                                                     'commission_rate',
-                                                    parseFloat(e.target.value)
+                                                    parseFloat(e.target.value),
                                                 )
                                             }
                                             required
@@ -315,8 +334,8 @@ export default function PartnerCreate() {
                                         </span>
                                     </div>
                                     <p className="text-sm text-slate-500 dark:text-slate-500">
-                                        Standard commission rate for referrals with
-                                        this partner (0-100%)
+                                        Standard commission rate for referrals
+                                        with this partner (0-100%)
                                     </p>
                                     {errors.commission_rate && (
                                         <p className="text-sm text-red-600 dark:text-red-400">

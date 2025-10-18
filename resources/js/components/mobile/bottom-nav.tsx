@@ -1,7 +1,7 @@
-import { cn } from '@/lib/utils';
 import { CapacitorUtils } from '@/lib/capacitor-utils';
+import { cn } from '@/lib/utils';
 import { router, usePage } from '@inertiajs/react';
-import { Home, Users, QrCode, Settings, Plus } from 'lucide-react';
+import { Home, Plus, QrCode, Settings, Users } from 'lucide-react';
 
 // Import route helper - note: this may need adjustment based on your Wayfinder setup
 declare global {
@@ -58,7 +58,7 @@ export function BottomNav() {
     };
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
             {/* Safe area padding for iOS */}
             <div className="pb-safe">
                 <div className="grid grid-cols-5 gap-0">
@@ -78,9 +78,14 @@ export function BottomNav() {
                                 )}
                             >
                                 <div className="relative">
-                                    <Icon className={cn('h-6 w-6', active && 'scale-110')} />
+                                    <Icon
+                                        className={cn(
+                                            'h-6 w-6',
+                                            active && 'scale-110',
+                                        )}
+                                    />
                                     {item.badge && item.badge > 0 && (
-                                        <span className="absolute -right-2 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                                        <span className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                                             {item.badge > 9 ? '9+' : item.badge}
                                         </span>
                                     )}

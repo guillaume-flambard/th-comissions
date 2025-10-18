@@ -89,7 +89,7 @@ export default function PartnersIndex({
     // Local search state (for immediate UI feedback)
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [businessTypeFilter, setBusinessTypeFilter] = useState(
-        filters.business_type || 'All Types'
+        filters.business_type || 'All Types',
     );
 
     /**
@@ -142,7 +142,7 @@ export default function PartnersIndex({
     const handleDeletePartner = (partner: Partner) => {
         if (
             confirm(
-                `Are you sure you want to delete ${partner.name}? This action cannot be undone.`
+                `Are you sure you want to delete ${partner.name}? This action cannot be undone.`,
             )
         ) {
             router.delete(`/partners/${partner.id}`);
@@ -163,9 +163,9 @@ export default function PartnersIndex({
                             No partners yet
                         </h1>
                         <p className="mt-2 text-slate-600 dark:text-slate-400">
-                            Start building your partner network by adding your first
-                            partner. Generate QR codes and track commissions
-                            effortlessly.
+                            Start building your partner network by adding your
+                            first partner. Generate QR codes and track
+                            commissions effortlessly.
                         </p>
                         <Button
                             size="lg"
@@ -192,11 +192,12 @@ export default function PartnersIndex({
                 {/* Header */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white md:text-3xl">
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl dark:text-white">
                             Partners
                         </h1>
                         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                            Manage your partner relationships and track commissions
+                            Manage your partner relationships and track
+                            commissions
                         </p>
                     </div>
                     <Button size="lg" onClick={handleAddPartner}>
@@ -211,7 +212,7 @@ export default function PartnersIndex({
                     <div className="flex flex-1 gap-3">
                         {/* Search */}
                         <div className="relative flex-1 md:max-w-sm">
-                            <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                            <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
                             <Input
                                 type="text"
                                 placeholder="Search partners..."
@@ -242,14 +243,18 @@ export default function PartnersIndex({
                     {/* View Toggle */}
                     <div className="flex gap-2">
                         <Button
-                            variant={viewMode === 'grid' ? 'default' : 'outline'}
+                            variant={
+                                viewMode === 'grid' ? 'default' : 'outline'
+                            }
                             size="icon"
                             onClick={() => setViewMode('grid')}
                         >
                             <GridIcon className="size-4" />
                         </Button>
                         <Button
-                            variant={viewMode === 'list' ? 'default' : 'outline'}
+                            variant={
+                                viewMode === 'list' ? 'default' : 'outline'
+                            }
                             size="icon"
                             onClick={() => setViewMode('list')}
                         >

@@ -1,7 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 import { ArrowRightIcon } from 'lucide-react';
 
 /**
@@ -61,7 +60,7 @@ export function RecentReferralsTable({
      * Get badge variant based on referral status
      */
     const getStatusBadgeVariant = (
-        status: ReferralStatus
+        status: ReferralStatus,
     ): 'default' | 'secondary' | 'destructive' | 'outline' => {
         switch (status) {
             case 'paid':
@@ -127,7 +126,8 @@ export function RecentReferralsTable({
                             No referrals yet
                         </h3>
                         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                            Start tracking referrals by generating QR codes for your partners
+                            Start tracking referrals by generating QR codes for
+                            your partners
                         </p>
                     </div>
                 </CardContent>
@@ -153,25 +153,25 @@ export function RecentReferralsTable({
                         <table className="w-full">
                             <thead className="bg-slate-50 dark:bg-slate-900">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                         Customer
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                         Partner
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                         Service
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                         Amount
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                         Commission
                                     </th>
-                                    <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-4 py-3 text-center text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                         Status
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-4 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                                         Date
                                     </th>
                                 </tr>
@@ -195,12 +195,14 @@ export function RecentReferralsTable({
                                             {formatCurrency(referral.amount)}
                                         </td>
                                         <td className="px-4 py-3 text-right text-sm font-semibold text-blue-600 dark:text-blue-400">
-                                            {formatCurrency(referral.commission)}
+                                            {formatCurrency(
+                                                referral.commission,
+                                            )}
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                             <Badge
                                                 variant={getStatusBadgeVariant(
-                                                    referral.status
+                                                    referral.status,
                                                 )}
                                             >
                                                 {formatStatus(referral.status)}
@@ -234,7 +236,7 @@ export function RecentReferralsTable({
                                 </div>
                                 <Badge
                                     variant={getStatusBadgeVariant(
-                                        referral.status
+                                        referral.status,
                                     )}
                                 >
                                     {formatStatus(referral.status)}

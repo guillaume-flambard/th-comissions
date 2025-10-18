@@ -1,7 +1,5 @@
-import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     Select,
@@ -10,16 +8,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Head, router } from '@inertiajs/react';
 import {
+    CheckCircle,
+    Clock,
+    CreditCard,
     DollarSign,
     Download,
-    CheckCircle,
-    XCircle,
-    Clock,
     Filter,
-    CreditCard,
-    AlertCircle,
+    XCircle,
 } from 'lucide-react';
+import { useState } from 'react';
 
 interface Partner {
     id: number;
@@ -68,8 +67,15 @@ interface Props {
     partners: Partner[];
 }
 
-export default function CommissionsIndex({ commissions, filters, stats, partners }: Props) {
-    const [selectedCommissions, setSelectedCommissions] = useState<number[]>([]);
+export default function CommissionsIndex({
+    commissions,
+    filters,
+    stats,
+    partners,
+}: Props) {
+    const [selectedCommissions, setSelectedCommissions] = useState<number[]>(
+        [],
+    );
     const [isProcessing, setIsProcessing] = useState(false);
 
     const formatCurrency = (amount: number) => {
@@ -92,7 +98,7 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
         router.get(
             route('admin.commissions.index'),
             { ...filters, [key]: value, page: 1 },
-            { preserveState: true, preserveScroll: true }
+            { preserveState: true, preserveScroll: true },
         );
     };
 
@@ -108,7 +114,7 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
         setSelectedCommissions((prev) =>
             prev.includes(commissionId)
                 ? prev.filter((id) => id !== commissionId)
-                : [...prev, commissionId]
+                : [...prev, commissionId],
         );
     };
 
@@ -128,7 +134,7 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                 onError: () => {
                     setIsProcessing(false);
                 },
-            }
+            },
         );
     };
 
@@ -148,7 +154,7 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                 onError: () => {
                     setIsProcessing(false);
                 },
-            }
+            },
         );
     };
 
@@ -269,34 +275,55 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                     <Select
                                         value={filters.status || 'all'}
                                         onValueChange={(value) =>
-                                            handleFilter('status', value === 'all' ? '' : value)
+                                            handleFilter(
+                                                'status',
+                                                value === 'all' ? '' : value,
+                                            )
                                         }
                                     >
                                         <SelectTrigger className="w-[180px]">
                                             <SelectValue placeholder="Status" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">All Status</SelectItem>
-                                            <SelectItem value="pending">Pending</SelectItem>
-                                            <SelectItem value="approved">Approved</SelectItem>
-                                            <SelectItem value="paid">Paid</SelectItem>
-                                            <SelectItem value="rejected">Rejected</SelectItem>
+                                            <SelectItem value="all">
+                                                All Status
+                                            </SelectItem>
+                                            <SelectItem value="pending">
+                                                Pending
+                                            </SelectItem>
+                                            <SelectItem value="approved">
+                                                Approved
+                                            </SelectItem>
+                                            <SelectItem value="paid">
+                                                Paid
+                                            </SelectItem>
+                                            <SelectItem value="rejected">
+                                                Rejected
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
 
                                     <Select
                                         value={filters.partner_id || 'all'}
                                         onValueChange={(value) =>
-                                            handleFilter('partner_id', value === 'all' ? '' : value)
+                                            handleFilter(
+                                                'partner_id',
+                                                value === 'all' ? '' : value,
+                                            )
                                         }
                                     >
                                         <SelectTrigger className="w-[200px]">
                                             <SelectValue placeholder="Partner" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">All Partners</SelectItem>
+                                            <SelectItem value="all">
+                                                All Partners
+                                            </SelectItem>
                                             {partners.map((partner) => (
-                                                <SelectItem key={partner.id} value={partner.id.toString()}>
+                                                <SelectItem
+                                                    key={partner.id}
+                                                    value={partner.id.toString()}
+                                                >
                                                     {partner.business_name}
                                                 </SelectItem>
                                             ))}
@@ -313,7 +340,8 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                                 disabled={isProcessing}
                                             >
                                                 <CheckCircle className="mr-2 h-4 w-4" />
-                                                Approve ({selectedCommissions.length})
+                                                Approve (
+                                                {selectedCommissions.length})
                                             </Button>
                                             <Button
                                                 variant="outline"
@@ -321,11 +349,15 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                                 disabled={isProcessing}
                                             >
                                                 <CreditCard className="mr-2 h-4 w-4" />
-                                                Mark as Paid ({selectedCommissions.length})
+                                                Mark as Paid (
+                                                {selectedCommissions.length})
                                             </Button>
                                         </>
                                     )}
-                                    <Button variant="outline" onClick={handleExportCsv}>
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleExportCsv}
+                                    >
                                         <Download className="mr-2 h-4 w-4" />
                                         Export CSV
                                     </Button>
@@ -350,26 +382,51 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                             <th className="w-12 pb-3">
                                                 <Checkbox
                                                     checked={
-                                                        selectedCommissions.length === commissions.data.length &&
-                                                        commissions.data.length > 0
+                                                        selectedCommissions.length ===
+                                                            commissions.data
+                                                                .length &&
+                                                        commissions.data
+                                                            .length > 0
                                                     }
-                                                    onCheckedChange={handleSelectAll}
+                                                    onCheckedChange={
+                                                        handleSelectAll
+                                                    }
                                                 />
                                             </th>
-                                            <th className="pb-3 font-medium">Booking Ref</th>
-                                            <th className="pb-3 font-medium">Partner</th>
-                                            <th className="pb-3 font-medium">Amount</th>
-                                            <th className="pb-3 font-medium">Rate</th>
-                                            <th className="pb-3 font-medium">Created</th>
-                                            <th className="pb-3 font-medium">Status</th>
-                                            <th className="pb-3 font-medium">Payment Info</th>
-                                            <th className="pb-3 font-medium">Actions</th>
+                                            <th className="pb-3 font-medium">
+                                                Booking Ref
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Partner
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Amount
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Rate
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Created
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Status
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Payment Info
+                                            </th>
+                                            <th className="pb-3 font-medium">
+                                                Actions
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                         {commissions.data.map((commission) => {
-                                            const statusConfig = getStatusConfig(commission.status);
-                                            const StatusIcon = statusConfig.icon;
+                                            const statusConfig =
+                                                getStatusConfig(
+                                                    commission.status,
+                                                );
+                                            const StatusIcon =
+                                                statusConfig.icon;
 
                                             return (
                                                 <tr
@@ -378,26 +435,42 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                                 >
                                                     <td className="py-4">
                                                         <Checkbox
-                                                            checked={selectedCommissions.includes(commission.id)}
+                                                            checked={selectedCommissions.includes(
+                                                                commission.id,
+                                                            )}
                                                             onCheckedChange={() =>
-                                                                handleSelectCommission(commission.id)
+                                                                handleSelectCommission(
+                                                                    commission.id,
+                                                                )
                                                             }
                                                         />
                                                     </td>
                                                     <td className="py-4 font-mono text-xs">
-                                                        {commission.booking_reference}
+                                                        {
+                                                            commission.booking_reference
+                                                        }
                                                     </td>
                                                     <td className="py-4 font-medium text-gray-900 dark:text-white">
-                                                        {commission.partner.business_name}
+                                                        {
+                                                            commission.partner
+                                                                .business_name
+                                                        }
                                                     </td>
                                                     <td className="py-4 text-lg font-bold text-green-600 dark:text-green-400">
-                                                        {formatCurrency(commission.amount)}
+                                                        {formatCurrency(
+                                                            commission.amount,
+                                                        )}
                                                     </td>
                                                     <td className="py-4 text-gray-600 dark:text-gray-400">
-                                                        {commission.commission_rate}%
+                                                        {
+                                                            commission.commission_rate
+                                                        }
+                                                        %
                                                     </td>
                                                     <td className="py-4 text-gray-600 dark:text-gray-400">
-                                                        {formatDate(commission.created_at)}
+                                                        {formatDate(
+                                                            commission.created_at,
+                                                        )}
                                                     </td>
                                                     <td className="py-4">
                                                         <span
@@ -411,11 +484,15 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                                         {commission.invoice_number && (
                                                             <div className="text-xs">
                                                                 <div className="font-medium text-gray-900 dark:text-white">
-                                                                    {commission.invoice_number}
+                                                                    {
+                                                                        commission.invoice_number
+                                                                    }
                                                                 </div>
                                                                 {commission.payment_method && (
                                                                     <div className="text-gray-500 dark:text-gray-400">
-                                                                        {commission.payment_method}
+                                                                        {
+                                                                            commission.payment_method
+                                                                        }
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -423,7 +500,8 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                                     </td>
                                                     <td className="py-4">
                                                         <div className="flex gap-2">
-                                                            {commission.status === 'pending' && (
+                                                            {commission.status ===
+                                                                'pending' && (
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="sm"
@@ -431,15 +509,16 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                                                         router.post(
                                                                             route(
                                                                                 'admin.commissions.approve',
-                                                                                commission.id
-                                                                            )
+                                                                                commission.id,
+                                                                            ),
                                                                         )
                                                                     }
                                                                 >
                                                                     Approve
                                                                 </Button>
                                                             )}
-                                                            {commission.status === 'approved' && (
+                                                            {commission.status ===
+                                                                'approved' && (
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="sm"
@@ -447,8 +526,8 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                                                         router.post(
                                                                             route(
                                                                                 'admin.commissions.pay',
-                                                                                commission.id
-                                                                            )
+                                                                                commission.id,
+                                                                            ),
                                                                         )
                                                                     }
                                                                 >
@@ -462,8 +541,8 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                                                     router.get(
                                                                         route(
                                                                             'admin.commissions.show',
-                                                                            commission.id
-                                                                        )
+                                                                            commission.id,
+                                                                        ),
                                                                     )
                                                                 }
                                                             >
@@ -483,36 +562,47 @@ export default function CommissionsIndex({ commissions, filters, stats, partners
                                 <div className="mt-6 flex items-center justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
                                     <div className="text-sm text-gray-600 dark:text-gray-400">
                                         Showing{' '}
-                                        {(commissions.current_page - 1) * commissions.per_page + 1} to{' '}
+                                        {(commissions.current_page - 1) *
+                                            commissions.per_page +
+                                            1}{' '}
+                                        to{' '}
                                         {Math.min(
-                                            commissions.current_page * commissions.per_page,
-                                            commissions.total
+                                            commissions.current_page *
+                                                commissions.per_page,
+                                            commissions.total,
                                         )}{' '}
                                         of {commissions.total} commissions
                                     </div>
                                     <div className="flex gap-2">
-                                        {Array.from({ length: commissions.last_page }, (_, i) => i + 1).map(
-                                            (page) => (
-                                                <Button
-                                                    key={page}
-                                                    variant={
-                                                        page === commissions.current_page
-                                                            ? 'default'
-                                                            : 'outline'
-                                                    }
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        router.get(
-                                                            route('admin.commissions.index'),
-                                                            { ...filters, page },
-                                                            { preserveState: true, preserveScroll: true }
-                                                        )
-                                                    }
-                                                >
-                                                    {page}
-                                                </Button>
-                                            )
-                                        )}
+                                        {Array.from(
+                                            { length: commissions.last_page },
+                                            (_, i) => i + 1,
+                                        ).map((page) => (
+                                            <Button
+                                                key={page}
+                                                variant={
+                                                    page ===
+                                                    commissions.current_page
+                                                        ? 'default'
+                                                        : 'outline'
+                                                }
+                                                size="sm"
+                                                onClick={() =>
+                                                    router.get(
+                                                        route(
+                                                            'admin.commissions.index',
+                                                        ),
+                                                        { ...filters, page },
+                                                        {
+                                                            preserveState: true,
+                                                            preserveScroll: true,
+                                                        },
+                                                    )
+                                                }
+                                            >
+                                                {page}
+                                            </Button>
+                                        ))}
                                     </div>
                                 </div>
                             )}

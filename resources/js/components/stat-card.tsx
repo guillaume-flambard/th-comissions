@@ -80,8 +80,8 @@ export function StatCard({
     return (
         <Card
             className={cn(
-                'transition-all duration-200 hover:shadow-md border-slate-200/70 dark:border-slate-800',
-                className
+                'border-slate-200/70 transition-all duration-200 hover:shadow-md dark:border-slate-800',
+                className,
             )}
         >
             <CardContent className="pt-6">
@@ -105,7 +105,7 @@ export function StatCard({
                                         'inline-flex items-center gap-0.5 rounded-md px-2 py-0.5 text-xs font-medium',
                                         isPositiveChange
                                             ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400'
-                                            : 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400'
+                                            : 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400',
                                     )}
                                 >
                                     {isPositiveChange ? (
@@ -131,7 +131,7 @@ export function StatCard({
                         <div
                             className={cn(
                                 'rounded-xl p-3',
-                                variantStyles[variant]
+                                variantStyles[variant],
                             )}
                         >
                             <Icon className="size-6" />

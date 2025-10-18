@@ -8,14 +8,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import {
     EditIcon,
     MoreVerticalIcon,
     QrCodeIcon,
-    TrendingUpIcon,
     TrashIcon,
+    TrendingUpIcon,
 } from 'lucide-react';
 
 /**
@@ -96,7 +95,7 @@ export function PartnerCard({
      * Get business type color variant
      */
     const getBusinessTypeVariant = (
-        type: string
+        type: string,
     ): 'default' | 'secondary' | 'outline' => {
         const typeMap: Record<string, 'default' | 'secondary' | 'outline'> = {
             'dive shop': 'default',
@@ -240,7 +239,7 @@ export function PartnerCard({
                         <span className="font-semibold text-blue-600 dark:text-blue-400">
                             {formatCurrency(
                                 partner.total_commission_paid +
-                                    partner.total_commission_received
+                                    partner.total_commission_received,
                             )}
                         </span>
                     </div>
@@ -286,7 +285,9 @@ export function PartnerCard({
                                     {partner.name}
                                 </h3>
                                 <Badge
-                                    variant={getBusinessTypeVariant(partner.type)}
+                                    variant={getBusinessTypeVariant(
+                                        partner.type,
+                                    )}
                                 >
                                     {partner.type}
                                 </Badge>
@@ -324,7 +325,7 @@ export function PartnerCard({
                             <p className="mt-1 text-lg font-semibold text-blue-600 dark:text-blue-400">
                                 {formatCurrency(
                                     partner.total_commission_paid +
-                                        partner.total_commission_received
+                                        partner.total_commission_received,
                                 )}
                             </p>
                         </div>
@@ -339,7 +340,11 @@ export function PartnerCard({
                         >
                             View Details
                         </Button>
-                        <Button variant="default" size="sm" onClick={handleGenerateQR}>
+                        <Button
+                            variant="default"
+                            size="sm"
+                            onClick={handleGenerateQR}
+                        >
                             <QrCodeIcon className="mr-1 size-4" />
                             QR Code
                         </Button>

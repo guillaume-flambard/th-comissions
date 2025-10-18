@@ -93,7 +93,9 @@ export class CapacitorUtils {
     /**
      * Trigger haptic feedback
      */
-    static async hapticImpact(style: 'light' | 'medium' | 'heavy' = 'medium'): Promise<void> {
+    static async hapticImpact(
+        style: 'light' | 'medium' | 'heavy' = 'medium',
+    ): Promise<void> {
         if (!this.isNative()) return;
 
         try {

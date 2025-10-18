@@ -1,6 +1,12 @@
-import { CapacitorUtils } from '@/lib/capacitor-utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { CapacitorUtils } from '@/lib/capacitor-utils';
 import { Download, Share2 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useRef } from 'react';
@@ -50,7 +56,9 @@ export function QRDisplay({
 
             // Convert data URL to blob for sharing
             const blob = await (await fetch(dataUrl)).blob();
-            const file = new File([blob], 'trackly-qr.png', { type: 'image/png' });
+            const file = new File([blob], 'trackly-qr.png', {
+                type: 'image/png',
+            });
 
             if (navigator.share && navigator.canShare({ files: [file] })) {
                 await navigator.share({
@@ -77,7 +85,11 @@ export function QRDisplay({
         <Card className="border-0 shadow-xl">
             <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                 <CardTitle>{title || 'Your QR Code'}</CardTitle>
-                {description && <CardDescription className="text-white/80">{description}</CardDescription>}
+                {description && (
+                    <CardDescription className="text-white/80">
+                        {description}
+                    </CardDescription>
+                )}
             </CardHeader>
 
             <CardContent className="space-y-6 pt-8">
@@ -98,8 +110,10 @@ export function QRDisplay({
 
                 {/* Value Display */}
                 <div className="rounded-lg bg-gray-100 p-4 text-center dark:bg-gray-800">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">QR Code Value</p>
-                    <p className="mt-1 break-all font-mono text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        QR Code Value
+                    </p>
+                    <p className="mt-1 font-mono text-sm font-medium break-all text-gray-900 dark:text-white">
                         {value}
                     </p>
                 </div>
@@ -107,7 +121,11 @@ export function QRDisplay({
                 {/* Actions */}
                 <div className="grid grid-cols-2 gap-3">
                     {showDownload && (
-                        <Button variant="outline" onClick={handleDownload} className="w-full">
+                        <Button
+                            variant="outline"
+                            onClick={handleDownload}
+                            className="w-full"
+                        >
                             <Download className="mr-2 h-4 w-4" />
                             Download
                         </Button>
@@ -125,8 +143,10 @@ export function QRDisplay({
 
                 {/* Instructions */}
                 <div className="rounded-lg bg-blue-50 p-4 text-sm dark:bg-blue-950">
-                    <p className="font-medium text-blue-900 dark:text-blue-100">How to use:</p>
-                    <ul className="ml-4 mt-2 list-disc space-y-1 text-blue-800 dark:text-blue-200">
+                    <p className="font-medium text-blue-900 dark:text-blue-100">
+                        How to use:
+                    </p>
+                    <ul className="mt-2 ml-4 list-disc space-y-1 text-blue-800 dark:text-blue-200">
                         <li>Share this QR code with customers</li>
                         <li>They scan it to book services</li>
                         <li>You earn commission on bookings</li>
