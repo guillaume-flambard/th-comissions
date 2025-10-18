@@ -1,0 +1,255 @@
+import { Head, router } from '@inertiajs/react';
+import { useState } from 'react';
+import MobileLayout from '@/layouts/mobile-layout';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import {
+    Search,
+    ChevronRight,
+    TrendingUp,
+    TrendingDown,
+    Activity,
+    AlertTriangle,
+    QrCode,
+    MapPin,
+    Phone,
+} from 'lucide-react';
+import { CapacitorUtils } from '@/lib/capacitor-utils';
+import { admin } from '@/routes';
+
+interface PartnerTier {
+    id: number;
+    name: string;
+    slug: string;
+    color: string;
+}
+
+interface Partner {
+    id: number;
+    business_name: string;
+    business_type: string;
+    contact_name: string;
+    email: string;
+    phone: string;
+    city: string;
+    calculated_plv: number;
+    total_referrals: number;
+    successful_conversions: number;
+    conversion_rate: number;
+    total_revenue_generated: number;
+    engagement_score: number;
+    churn_rate: number;
+    last_referral_at: string | null;
+    is_active: boolean;
+    joined_at: string;
+    tier: PartnerTier | null;
+}
+
+interface Props {
+    partners: {
+        data: Partner[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    };
+    filters: {
+        search?: string;
+    };
+}
+
+export default function PartnersIndexMobile({ partners, filters }: Props) {
+    const [search, setSearch] = useState(filters.search || '');
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('th-TH', {
+            style: 'currency',
+            currency: 'THB',
+            minimumFractionDigits: 0,
+        }).format(amount);
+    };
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get(
+            admin.partners.index().url,
+            { search },
+            { preserveState: true, preserveScroll: true },
+        );
+    };
+
+    const handlePartnerClick = async (partnerId: number) => {
+        await CapacitorUtils.hapticImpact('light');
+        router.visit(admin.partners.show({ partner: partnerId }).url);
+    };
+
+    const handleShowQR = async (partnerId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        await CapacitorUtils.hapticImpact('medium');
+        router.visit(admin.partners.qr({ partner: partnerId }).url);
+    };
+
+    const getStatusBadge = (partner: Partner) => {
+        if (!partner.is_active) {
+            return (
+                <Badge variant="destructive" className="text-xs">
+                    Inactive
+                </Badge>
+            );
+        }
+
+        if (partner.churn_rate > 50) {
+            return (
+                <Badge variant="outline" className="border-orange-500 text-xs text-orange-600">
+                    <AlertTriangle className="mr-1 h-3 w-3" />
+                    At Risk
+                </Badge>
+            );
+        }
+
+        return (
+            <Badge variant="outline" className="border-green-500 text-xs text-green-600">
+                Active
+            </Badge>
+        );
+    };
+
+    const getEngagementIcon = (score: number) => {
+        if (score >= 80) {
+            return <TrendingUp className="h-4 w-4 text-green-500" />;
+        }
+        if (score >= 50) {
+            return <Activity className="h-4 w-4 text-yellow-500" />;
+        }
+        return <TrendingDown className="h-4 w-4 text-red-500" />;
+    };
+
+    return (
+        <MobileLayout title="Partners">
+            <Head title="Partners" />
+
+            <div className="space-y-4 p-4">
+                {/* Header */}
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Partners</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {partners.total} total • {partners.data.filter((p) => p.is_active).length} active
+                    </p>
+                </div>
+
+                {/* Search */}
+                <form onSubmit={handleSearch}>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                        <Input
+                            type="text"
+                            placeholder="Search partners..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="h-12 pl-10 pr-4 text-base"
+                        />
+                    </div>
+                </form>
+
+                {/* Partners List */}
+                <div className="space-y-3">
+                    {partners.data.map((partner) => (
+                        <Card
+                            key={partner.id}
+                            className="cursor-pointer border-0 shadow-lg transition-transform active:scale-98"
+                            onClick={() => handlePartnerClick(partner.id)}
+                        >
+                            <CardContent className="p-4">
+                                {/* Header Row */}
+                                <div className="mb-3 flex items-start justify-between">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-semibold text-gray-900 dark:text-white">
+                                                {partner.business_name}
+                                            </h3>
+                                            {getEngagementIcon(partner.engagement_score)}
+                                        </div>
+                                        <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                            <span className="capitalize">
+                                                {partner.business_type.replace('_', ' ')}
+                                            </span>
+                                            <span>•</span>
+                                            <div className="flex items-center gap-1">
+                                                <MapPin className="h-3 w-3" />
+                                                {partner.city}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <ChevronRight className="h-5 w-5 text-gray-400" />
+                                </div>
+
+                                {/* Stats Grid */}
+                                <div className="mb-3 grid grid-cols-3 gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">PLV</p>
+                                        <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                            {formatCurrency(partner.calculated_plv)}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Revenue</p>
+                                        <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+                                            {formatCurrency(partner.total_revenue_generated)}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Conv. Rate</p>
+                                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                            {partner.conversion_rate.toFixed(1)}%
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Footer Row */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        {getStatusBadge(partner)}
+                                        {partner.tier && (
+                                            <Badge
+                                                variant="outline"
+                                                className="text-xs"
+                                                style={{
+                                                    borderColor: partner.tier.color,
+                                                    color: partner.tier.color,
+                                                }}
+                                            >
+                                                {partner.tier.name}
+                                            </Badge>
+                                        )}
+                                    </div>
+
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-8 px-2"
+                                        onClick={(e) => handleShowQR(partner.id, e)}
+                                    >
+                                        <QrCode className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* Load More / Pagination */}
+                {partners.last_page > 1 && (
+                    <div className="flex justify-center pb-4">
+                        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-lg dark:bg-gray-800">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                                Page {partners.current_page} of {partners.last_page}
+                            </span>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </MobileLayout>
+    );
+}

@@ -1,0 +1,10 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Trackly icon only -->
+  <rect x="10" y="8" width="6" height="24" rx="3" fill="#2563EB"/>
+  <rect x="7" y="8" width="12" height="6" rx="3" fill="#2563EB"/>
+
+  <!-- Tracking dots -->
+  <circle cx="24" cy="16" r="2.5" fill="#2563EB"/>
+  <circle cx="30" cy="20" r="2.5" fill="#2563EB"/>
+  <circle cx="24" cy="24" r="2.5" fill="#2563EB"/>
+</svg>

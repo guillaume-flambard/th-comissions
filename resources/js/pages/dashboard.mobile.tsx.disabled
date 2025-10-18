@@ -1,0 +1,245 @@
+import { Head, router } from '@inertiajs/react';
+import MobileLayout from '@/layouts/mobile-layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+    DollarSign,
+    TrendingUp,
+    Users,
+    Calendar,
+    ArrowRight,
+    Plus,
+    QrCode,
+    Bell,
+} from 'lucide-react';
+import { CapacitorUtils } from '@/lib/capacitor-utils';
+import { booking } from '@/routes';
+import { admin } from '@/routes';
+
+interface DashboardProps {
+    stats?: {
+        totalCommissions: number;
+        pendingCommissions: number;
+        thisMonth: number;
+        partnersCount: number;
+        referralsCount: number;
+    };
+    recentActivity?: Array<{
+        id: number;
+        title: string;
+        description: string;
+        amount?: number;
+        date: string;
+    }>;
+}
+
+export default function DashboardMobile({ stats, recentActivity }: DashboardProps) {
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('th-TH', {
+            style: 'currency',
+            currency: 'THB',
+            minimumFractionDigits: 0,
+        }).format(amount);
+    };
+
+    const handleQuickAction = async (action: string) => {
+        await CapacitorUtils.hapticImpact('medium');
+
+        switch (action) {
+            case 'log':
+                router.visit(booking.create().url);
+                break;
+            case 'qr':
+                router.visit(admin.partners.qr({ partner: 1 }).url); // Update with actual partner ID
+                break;
+            case 'partners':
+                router.visit(admin.partners.index().url);
+                break;
+        }
+    };
+
+    return (
+        <MobileLayout title="Dashboard">
+            <Head title="Dashboard" />
+
+            <div className="space-y-4 p-4">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {new Date().toLocaleDateString('th-TH', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            })}
+                        </p>
+                    </div>
+                    <Button variant="ghost" size="icon">
+                        <Bell className="h-5 w-5" />
+                    </Button>
+                </div>
+
+                {/* Main Stats Card */}
+                <Card className="border-0 bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-xl">
+                    <CardContent className="p-6">
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-blue-100">Total Commission</p>
+                                <h2 className="mt-2 text-4xl font-bold">
+                                    {formatCurrency(stats?.totalCommissions || 0)}
+                                </h2>
+                                <div className="mt-4 flex items-center gap-2">
+                                    <TrendingUp className="h-4 w-4 text-green-300" />
+                                    <span className="text-sm text-blue-100">
+                                        {formatCurrency(stats?.thisMonth || 0)} this month
+                                    </span>
+                                </div>
+                            </div>
+                            <DollarSign className="h-12 w-12 text-blue-200" />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Quick Stats Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                    <Card className="border-0 shadow-lg">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="rounded-full bg-orange-100 p-2 dark:bg-orange-950">
+                                    <Calendar className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">Pending</p>
+                                    <p className="text-lg font-bold text-gray-900 dark:text-white">
+                                        {formatCurrency(stats?.pendingCommissions || 0)}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-0 shadow-lg">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="rounded-full bg-purple-100 p-2 dark:bg-purple-950">
+                                    <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">Partners</p>
+                                    <p className="text-lg font-bold text-gray-900 dark:text-white">
+                                        {stats?.partnersCount || 0}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Quick Actions */}
+                <Card className="border-0 shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="text-base">Quick Actions</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                        <Button
+                            size="lg"
+                            className="w-full justify-start bg-gradient-to-r from-blue-500 to-blue-600"
+                            onClick={() => handleQuickAction('log')}
+                        >
+                            <Plus className="mr-3 h-5 w-5" />
+                            <span className="flex-1 text-left">Log New Referral</span>
+                            <ArrowRight className="h-5 w-5" />
+                        </Button>
+
+                        <Button
+                            size="lg"
+                            variant="outline"
+                            className="w-full justify-start"
+                            onClick={() => handleQuickAction('qr')}
+                        >
+                            <QrCode className="mr-3 h-5 w-5" />
+                            <span className="flex-1 text-left">Show My QR Code</span>
+                            <ArrowRight className="h-5 w-5" />
+                        </Button>
+
+                        <Button
+                            size="lg"
+                            variant="outline"
+                            className="w-full justify-start"
+                            onClick={() => handleQuickAction('partners')}
+                        >
+                            <Users className="mr-3 h-5 w-5" />
+                            <span className="flex-1 text-left">View Partners</span>
+                            <ArrowRight className="h-5 w-5" />
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                {/* Recent Activity */}
+                {recentActivity && recentActivity.length > 0 && (
+                    <Card className="border-0 shadow-lg">
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-base">Recent Activity</CardTitle>
+                                <Button variant="ghost" size="sm">
+                                    View All
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {recentActivity.map((activity) => (
+                                    <div
+                                        key={activity.id}
+                                        className="flex items-start gap-3 border-b border-gray-100 pb-4 last:border-0 dark:border-gray-800"
+                                    >
+                                        <div className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950">
+                                            <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="font-medium text-gray-900 dark:text-white">
+                                                {activity.title}
+                                            </p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                {activity.description}
+                                            </p>
+                                            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                                                {new Date(activity.date).toLocaleDateString('th-TH')}
+                                            </p>
+                                        </div>
+                                        {activity.amount && (
+                                            <div className="text-right">
+                                                <p className="font-semibold text-green-600 dark:text-green-400">
+                                                    {formatCurrency(activity.amount)}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Info Banner */}
+                <div className="rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-4 dark:from-blue-950 dark:to-purple-950">
+                    <div className="flex items-start gap-3">
+                        <div className="rounded-full bg-blue-500 p-2 text-white">
+                            <TrendingUp className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                            <p className="font-medium text-gray-900 dark:text-white">
+                                Keep Growing Your Network
+                            </p>
+                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                Share your QR code with customers to earn more commissions
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </MobileLayout>
+    );
+}

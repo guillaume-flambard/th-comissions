@@ -1,0 +1,330 @@
+import { Head, useForm } from '@inertiajs/react';
+import { FormEvent, useState } from 'react';
+import MobileLayout from '@/layouts/mobile-layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { QRScanner } from '@/components/mobile/qr-scanner';
+import {
+    Calendar,
+    DollarSign,
+    Package,
+    Mail,
+    Phone,
+    User,
+    Check,
+    QrCode as QrCodeIcon,
+} from 'lucide-react';
+import { CapacitorUtils } from '@/lib/capacitor-utils';
+import { booking } from '@/routes';
+
+interface Partner {
+    id: number;
+    business_name: string;
+    business_type: string;
+}
+
+interface Props {
+    partner?: Partner;
+    utm_params?: {
+        utm_source?: string;
+        utm_medium?: string;
+        utm_campaign?: string;
+        ref?: string;
+    };
+}
+
+export default function BookingCreateMobile({ partner, utm_params }: Props) {
+    const [showScanner, setShowScanner] = useState(false);
+    const { data, setData, post, processing, errors, reset } = useForm({
+        customer_name: '',
+        customer_email: '',
+        customer_phone: '',
+        customer_country: '',
+        service_type: '',
+        service_name: '',
+        service_date: '',
+        quantity: 1,
+        amount: '',
+        notes: '',
+        utm_source: utm_params?.utm_source || '',
+        utm_medium: utm_params?.utm_medium || '',
+        utm_campaign: utm_params?.utm_campaign || '',
+        ref: utm_params?.ref || '',
+    });
+
+    const serviceTypes = [
+        { value: 'diving', label: 'Diving', icon: '🤿' },
+        { value: 'tour', label: 'Tour', icon: '🏝️' },
+        { value: 'accommodation', label: 'Accommodation', icon: '🏨' },
+        { value: 'transport', label: 'Transport', icon: '🚗' },
+        { value: 'activities', label: 'Activities', icon: '🎯' },
+        { value: 'other', label: 'Other', icon: '📦' },
+    ];
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        await CapacitorUtils.hapticImpact('medium');
+
+        post(booking.store().url, {
+            preserveScroll: true,
+            onSuccess: async () => {
+                await CapacitorUtils.hapticImpact('heavy');
+                reset();
+            },
+        });
+    };
+
+    const handleQRScan = (code: string) => {
+        setData('ref', code);
+        setShowScanner(false);
+    };
+
+    if (showScanner) {
+        return (
+            <MobileLayout title="Scan QR Code" showBottomNav={false}>
+                <Head title="Scan QR Code" />
+                <div className="p-4">
+                    <QRScanner
+                        onScan={handleQRScan}
+                        onClose={() => setShowScanner(false)}
+                        title="Scan Partner QR"
+                        description="Scan the partner's QR code to log the referral"
+                    />
+                </div>
+            </MobileLayout>
+        );
+    }
+
+    return (
+        <MobileLayout title="Log Referral">
+            <Head title="Log Referral" />
+
+            <div className="space-y-4 p-4">
+                {/* Header */}
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Log New Referral</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Quick form to log customer bookings
+                    </p>
+                </div>
+
+                {/* Partner Info */}
+                {partner && (
+                    <Card className="border-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="rounded-full bg-white/20 p-2">
+                                    <Check className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-blue-100">Referred by</p>
+                                    <p className="font-semibold">{partner.business_name}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* QR Scanner Button */}
+                {!partner && (
+                    <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full"
+                        onClick={() => setShowScanner(true)}
+                    >
+                        <QrCodeIcon className="mr-2 h-5 w-5" />
+                        Scan Partner QR Code
+                    </Button>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Customer Info Card */}
+                    <Card className="border-0 shadow-lg">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <User className="h-5 w-5 text-blue-500" />
+                                Customer Information
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div>
+                                <Label htmlFor="customer_name">Full Name *</Label>
+                                <Input
+                                    id="customer_name"
+                                    type="text"
+                                    value={data.customer_name}
+                                    onChange={(e) => setData('customer_name', e.target.value)}
+                                    placeholder="John Doe"
+                                    className="mt-1 h-12"
+                                    required
+                                />
+                                {errors.customer_name && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.customer_name}</p>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <Label htmlFor="customer_email">Email *</Label>
+                                    <div className="relative mt-1">
+                                        <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                        <Input
+                                            id="customer_email"
+                                            type="email"
+                                            value={data.customer_email}
+                                            onChange={(e) => setData('customer_email', e.target.value)}
+                                            placeholder="john@email.com"
+                                            className="h-12 pl-10"
+                                            required
+                                        />
+                                    </div>
+                                    {errors.customer_email && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.customer_email}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="customer_phone">Phone</Label>
+                                    <div className="relative mt-1">
+                                        <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                        <Input
+                                            id="customer_phone"
+                                            type="tel"
+                                            value={data.customer_phone}
+                                            onChange={(e) => setData('customer_phone', e.target.value)}
+                                            placeholder="+66"
+                                            className="h-12 pl-10"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Service Info Card */}
+                    <Card className="border-0 shadow-lg">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <Package className="h-5 w-5 text-purple-500" />
+                                Service Details
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div>
+                                <Label htmlFor="service_type">Service Type *</Label>
+                                <Select
+                                    value={data.service_type}
+                                    onValueChange={(value) => setData('service_type', value)}
+                                    required
+                                >
+                                    <SelectTrigger className="mt-1 h-12">
+                                        <SelectValue placeholder="Select service type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {serviceTypes.map((type) => (
+                                            <SelectItem key={type.value} value={type.value}>
+                                                <span className="flex items-center gap-2">
+                                                    <span>{type.icon}</span>
+                                                    {type.label}
+                                                </span>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="service_name">Service Name *</Label>
+                                <Input
+                                    id="service_name"
+                                    type="text"
+                                    value={data.service_name}
+                                    onChange={(e) => setData('service_name', e.target.value)}
+                                    placeholder="e.g., Open Water Course"
+                                    className="mt-1 h-12"
+                                    required
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <Label htmlFor="service_date">Date *</Label>
+                                    <div className="relative mt-1">
+                                        <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                        <Input
+                                            id="service_date"
+                                            type="date"
+                                            value={data.service_date}
+                                            onChange={(e) => setData('service_date', e.target.value)}
+                                            className="h-12 pl-10"
+                                            required
+                                            min={new Date().toISOString().split('T')[0]}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="quantity">Quantity *</Label>
+                                    <Input
+                                        id="quantity"
+                                        type="number"
+                                        value={data.quantity}
+                                        onChange={(e) => setData('quantity', parseInt(e.target.value))}
+                                        min="1"
+                                        className="mt-1 h-12"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="amount">Amount (THB) *</Label>
+                                <div className="relative mt-1">
+                                    <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                    <Input
+                                        id="amount"
+                                        type="number"
+                                        value={data.amount}
+                                        onChange={(e) => setData('amount', e.target.value)}
+                                        placeholder="0.00"
+                                        step="0.01"
+                                        min="0"
+                                        className="h-12 pl-10"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="notes">Notes (Optional)</Label>
+                                <Textarea
+                                    id="notes"
+                                    value={data.notes}
+                                    onChange={(e) => setData('notes', e.target.value)}
+                                    placeholder="Any additional information..."
+                                    rows={3}
+                                    className="mt-1"
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Submit Button */}
+                    <Button
+                        type="submit"
+                        size="lg"
+                        disabled={processing}
+                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                    >
+                        {processing ? 'Logging Referral...' : 'Log Referral'}
+                    </Button>
+                </form>
+            </div>
+        </MobileLayout>
+    );
+}

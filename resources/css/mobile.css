@@ -1,0 +1,221 @@
+/**
+ * Mobile-specific CSS utilities for Capacitor apps
+ * Handles safe areas, native UI patterns, and touch optimizations
+ */
+
+/* Safe Area Insets for iOS */
+:root {
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-right: env(safe-area-inset-right);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
+}
+
+/* Safe area padding utilities */
+.pt-safe {
+    padding-top: var(--safe-area-inset-top);
+}
+
+.pr-safe {
+    padding-right: var(--safe-area-inset-right);
+}
+
+.pb-safe {
+    padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.pl-safe {
+    padding-left: var(--safe-area-inset-left);
+}
+
+.p-safe {
+    padding: var(--safe-area-inset-top) var(--safe-area-inset-right)
+        var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+}
+
+/* Prevent text selection on buttons and interactive elements */
+.mobile-button,
+button,
+[role='button'] {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling for mobile */
+.mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+/* Prevent pull-to-refresh on certain elements */
+.no-overscroll {
+    overscroll-behavior: none;
+}
+
+/* Touch feedback */
+.touch-feedback {
+    transition: transform 0.1s ease;
+}
+
+.touch-feedback:active {
+    transform: scale(0.98);
+}
+
+/* Prevent zoom on input focus (iOS) */
+input,
+select,
+textarea {
+    font-size: 16px; /* Prevents auto-zoom on iOS */
+}
+
+/* Hide scrollbar on mobile */
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Native-like card press effect */
+.card-press {
+    transition:
+        transform 0.1s ease,
+        box-shadow 0.1s ease;
+}
+
+.card-press:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Smooth height transitions for collapsible content */
+.collapsible-content {
+    transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Bottom navigation safe area */
+.bottom-nav-safe {
+    padding-bottom: calc(1rem + var(--safe-area-inset-bottom));
+}
+
+/* Full screen overlay (accounts for safe areas) */
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-top: var(--safe-area-inset-top);
+    padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* Minimum touch target size (iOS: 44x44px, Android: 48x48dp) */
+.touch-target {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Android-specific: larger touch target */
+@media (min-width: 768px) {
+    .touch-target {
+        min-width: 48px;
+        min-height: 48px;
+    }
+}
+
+/* Disable text selection for the entire app on mobile */
+body.mobile-app {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Re-enable text selection for specific elements */
+body.mobile-app input,
+body.mobile-app textarea,
+body.mobile-app [contenteditable='true'],
+body.mobile-app .selectable-text {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* Loading skeleton animation */
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        #f0f0f0 25%,
+        #e0e0e0 50%,
+        #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+/* Dark mode skeleton */
+.dark .skeleton {
+    background: linear-gradient(90deg, #2a2a2a 25%, #1a1a1a 50%, #2a2a2a 75%);
+    background-size: 200% 100%;
+}
+
+/* Pull to refresh indicator space */
+.ptr-content {
+    padding-top: 60px;
+}
+
+/* Swipe gesture indicators */
+.swipe-indicator {
+    position: relative;
+}
+
+.swipe-indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 4px;
+    height: 40%;
+    background: currentColor;
+    opacity: 0.3;
+    transform: translateY(-50%);
+    border-radius: 0 2px 2px 0;
+}
+
+/* Mobile-specific utility classes */
+.mobile-hidden {
+    display: none !important;
+}
+
+@media (min-width: 768px) {
+    .desktop-hidden {
+        display: none !important;
+    }
+    .mobile-hidden {
+        display: initial !important;
+    }
+}
+
+/* Haptic feedback indicator (subtle visual feedback) */
+@keyframes haptic-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.haptic-feedback {
+    animation: haptic-pulse 0.1s ease;
+}
