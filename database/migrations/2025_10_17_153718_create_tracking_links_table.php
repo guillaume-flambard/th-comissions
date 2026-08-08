@@ -18,7 +18,7 @@ return new class extends Migration
             // Tracking Identifiers
             $table->string('unique_code')->unique(); // Short code for URL (e.g., "ABC123")
             $table->string('utm_source')->nullable(); // Partner business name
-            $table->string('utm_medium')->default('referral'); // referral, qr_code, widget
+            $table->string('utm_medium')->nullable(); // referral, qr_code, widget
             $table->string('utm_campaign')->nullable(); // Campaign name if applicable
             $table->string('utm_content')->nullable(); // For A/B testing different materials
 

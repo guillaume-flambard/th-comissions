@@ -160,7 +160,7 @@ describe('Duplicate Referral Prevention', function () {
         ]);
 
         expect($booking1->id)->not->toBe($booking2->id);
-        expect($booking2->created_at->diffInHours($booking1->created_at))->toBeGreaterThan(24);
+        expect(abs($booking2->created_at->diffInHours($booking1->created_at)))->toBeGreaterThan(24);
     });
 });
 
@@ -223,7 +223,7 @@ describe('Commission Creation on Booking Completion', function () {
         expect($booking->commissions()->count())->toBe(1);
 
         $commission = $booking->commissions()->first();
-        expect($commission->amount)->toBe(1500.00);
+        expect($commission->amount)->toBe('1500.00');
         expect($commission->status)->toBe('pending');
     });
 
@@ -243,10 +243,10 @@ describe('Commission Creation on Booking Completion', function () {
         $commission = $booking->commissions()->first();
         expect($commission->partner_id)->toBe($partner->id);
         expect($commission->booking_id)->toBe($booking->id);
-        expect($commission->amount)->toBe(3600.00);
+        expect($commission->amount)->toBe('3600.00');
         expect($commission->currency)->toBe('THB');
-        expect($commission->base_amount)->toBe(20000.00);
-        expect($commission->commission_rate)->toBe(18.00);
+        expect($commission->base_amount)->toBe('20000.00');
+        expect($commission->commission_rate)->toBe('18.00');
         expect($commission->calculation_method)->toBe('percentage');
     });
 });
@@ -292,7 +292,7 @@ describe('Partner Metrics Update on Referral', function () {
 
         $booking->complete();
 
-        expect($partner->fresh()->total_revenue_generated)->toBe(15000.00);
+        expect($partner->fresh()->total_revenue_generated)->toBe('15000.00');
     });
 
     test('completing booking updates last referral timestamp', function () {
@@ -326,7 +326,7 @@ describe('Partner Metrics Update on Referral', function () {
 
         expect($partner->total_referrals)->toBe(1);
         expect($partner->successful_conversions)->toBe(1);
-        expect($partner->conversion_rate)->toBe(100.00);
+        expect($partner->conversion_rate)->toBe('100.00');
     });
 });
 
@@ -347,7 +347,7 @@ describe('Tracking Link Conversion Recording', function () {
         $trackingLink->refresh();
 
         expect($trackingLink->conversions)->toBe(1);
-        expect($trackingLink->total_revenue)->toBe(5000.00);
+        expect($trackingLink->total_revenue)->toBe('5000.00');
     });
 
     test('tracking link conversion rate is updated', function () {
@@ -367,7 +367,7 @@ describe('Tracking Link Conversion Recording', function () {
         $trackingLink->refresh();
 
         expect($trackingLink->conversions)->toBe(1);
-        expect($trackingLink->conversion_rate)->toBe(10.00); // 1/10 * 100
+        expect($trackingLink->conversion_rate)->toBe('10.00'); // 1/10 * 100
     });
 });
 
@@ -460,7 +460,7 @@ describe('Repeat Customer Tracking', function () {
             'customer_lifetime_value' => 25000.00,
         ]);
 
-        expect($booking->customer_lifetime_value)->toBe(25000.00);
+        expect($booking->customer_lifetime_value)->toBe('25000.00');
     });
 });
 

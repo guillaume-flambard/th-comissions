@@ -69,16 +69,16 @@ class BookingFactory extends Factory
             'currency' => $currency,
             'amount' => $amount,
             'commission_rate' => $commissionRate,
-            'commission_amount' => $structure === 'percentage' ? ($amount * $commissionRate) / 100 : $commissionRate,
+            'commission_amount' => null, // Let model calculate
             'commission_structure' => $structure,
-            'status' => fake()->randomElement($statuses),
+            'status' => 'pending', // Default to pending, use state methods for other statuses
             'confirmed_at' => null,
             'completed_at' => null,
             'cancelled_at' => null,
             'cancellation_reason' => null,
             'is_repeat_customer' => fake()->boolean(20),
             'customer_satisfaction_score' => null,
-            'customer_lifetime_value' => null,
+            'customer_lifetime_value' => fake()->randomFloat(2, 0, 50000),
             'metadata' => [],
             'notes' => fake()->optional()->sentence(),
         ];
@@ -144,12 +144,9 @@ class BookingFactory extends Factory
     public function withPercentageCommission(): static
     {
         return $this->state(function (array $attributes) {
-            $amount = $attributes['amount'] ?? 10000;
-            $rate = $attributes['commission_rate'] ?? 15.00;
-
             return [
                 'commission_structure' => 'percentage',
-                'commission_amount' => round(($amount * $rate) / 100, 2),
+                'commission_amount' => null, // Let model calculate
             ];
         });
     }
@@ -165,7 +162,7 @@ class BookingFactory extends Factory
             return [
                 'commission_structure' => 'fixed',
                 'commission_rate' => $fixedAmount,
-                'commission_amount' => $fixedAmount,
+                'commission_amount' => null, // Let model calculate
             ];
         });
     }
@@ -197,12 +194,10 @@ class BookingFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             $amount = fake()->randomFloat(2, 50000, 200000);
-            $rate = $attributes['commission_rate'] ?? 15.00;
-            $structure = $attributes['commission_structure'] ?? 'percentage';
 
             return [
                 'amount' => $amount,
-                'commission_amount' => $structure === 'percentage' ? ($amount * $rate) / 100 : $rate,
+                'commission_amount' => null, // Let model calculate
             ];
         });
     }

@@ -31,7 +31,8 @@ class CommissionFactory extends Factory
 
         $currency = fake()->randomElement($currencies);
         $amount = fake()->randomFloat(2, 100, 10000);
-        $exchangeRate = $currency === 'USD' ? 35.50 : 1.00;
+        $exchangeRate = $currency === 'USD' ? 1.00 : 35.50;
+        $amountUsd = $currency === 'USD' ? $amount : round($amount / $exchangeRate, 2);
 
         return [
             'partner_id' => Partner::factory(),
@@ -39,12 +40,12 @@ class CommissionFactory extends Factory
             'commission_type' => fake()->randomElement($commissionTypes),
             'amount' => $amount,
             'currency' => $currency,
-            'amount_usd' => $currency === 'THB' ? round($amount / $exchangeRate, 2) : $amount,
+            'amount_usd' => $amountUsd,
             'exchange_rate' => $exchangeRate,
             'base_amount' => fake()->randomFloat(2, 1000, 100000),
             'commission_rate' => fake()->randomFloat(2, 10, 20),
             'calculation_method' => fake()->randomElement($calculationMethods),
-            'status' => fake()->randomElement($statuses),
+            'status' => 'pending', // Default to pending, use state methods for other statuses
             'approved_at' => null,
             'approved_by' => null,
             'paid_at' => null,
@@ -141,7 +142,7 @@ class CommissionFactory extends Factory
 
             return [
                 'currency' => 'THB',
-                'exchange_rate' => 1.00,
+                'exchange_rate' => $exchangeRate,
                 'amount_usd' => round($amount / $exchangeRate, 2),
             ];
         });
@@ -157,7 +158,7 @@ class CommissionFactory extends Factory
 
             return [
                 'currency' => 'USD',
-                'exchange_rate' => 35.50,
+                'exchange_rate' => 1.00, // USD to USD conversion rate is 1.0
                 'amount_usd' => $amount,
             ];
         });

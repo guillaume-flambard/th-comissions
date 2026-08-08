@@ -30,9 +30,10 @@ class QRCodeService
         return $this->generateForTrackingLink($trackingLink, $size);
     }
 
-    public function generate(string $url, int $size = 300, string $filename = null): string
+    public function generate(string $url, int $size = 300, string $filename = null, string $format = 'png'): string
     {
-        $filename = $filename ?? 'qr-' . uniqid() . '.png';
+        $extension = strtolower($format);
+        $filename = $filename ?? 'qr-' . uniqid() . '.' . $extension;
 
         $qrCode = new QrCode(
             data: $url,
@@ -83,5 +84,49 @@ class QRCodeService
     public function getUrl(string $path): string
     {
         return Storage::disk('public')->url($path);
+    }
+
+    /**
+     * Delete QR code file
+     */
+    public function delete(string $path): bool
+    {
+        if (Storage::disk('public')->exists($path)) {
+            return Storage::disk('public')->delete($path);
+        }
+        return false;
+    }
+
+    /**
+     * Regenerate QR code for tracking link
+     */
+    public function regenerateForTrackingLink(TrackingLink $trackingLink, int $size = 300): string
+    {
+        // Delete old QR code if exists
+        if ($trackingLink->qr_code_path) {
+            $this->delete($trackingLink->qr_code_path);
+        }
+
+        // Generate new QR code
+        $path = $this->generateForTrackingLink($trackingLink, $size);
+
+        // Update tracking link with new path
+        $trackingLink->update(['qr_code_path' => $path]);
+
+        return $path;
+    }
+
+    /**
+     * Generate QR code with specific size options
+     */
+    public function generateWithSize(string $url, int $size, string $filename = null): string
+    {
+        // Validate size (must be one of the supported sizes)
+        $validSizes = [256, 512, 1024];
+        if (!in_array($size, $validSizes)) {
+            $size = 512; // Default to 512 if invalid
+        }
+
+        return $this->generate($url, $size, $filename);
     }
 }

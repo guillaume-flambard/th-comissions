@@ -27,29 +27,68 @@ interface DashboardProps {
      * Commission statistics
      */
     stats: {
-        commissions_earned_month: number;
-        commissions_owed_month: number;
-        active_partners_count: number;
-        pending_referrals_count: number;
-        commissions_earned_change?: number; // Percentage change from last month
-        commissions_owed_change?: number;
+        commissionsEarned: {
+            value: number;
+            trend: number;
+            isPositive: boolean;
+        };
+        commissionsOwed: {
+            value: number;
+            trend: number;
+            isPositive: boolean;
+        };
+        activePartners: {
+            value: number;
+        };
+        pendingReferrals: {
+            value: number;
+        };
     };
 
     /**
-     * Top 5 partners by commission value (Partner Lifetime Value preview)
+     * Top 5 partners by PLV
      */
-    top_partners: Array<{
+    topPartners: Array<{
         id: number;
-        name: string;
-        type: string;
-        total_commission: number;
-        referral_count: number;
+        business_name: string;
+        business_type: string;
+        total_referrals: number;
+        total_commissions_paid: number;
+        calculated_plv: number;
+        conversion_rate: number;
+        is_active: boolean;
     }>;
 
     /**
      * Recent referrals (last 10)
      */
-    recent_referrals: Referral[];
+    recentReferrals: Array<{
+        id: string;
+        customer_name: string;
+        service_type: string;
+        service_amount: number;
+        commission_amount: number;
+        status: string;
+        booking_date: string;
+        referring_partner: {
+            id: number;
+            business_name: string;
+        };
+        receiving_partner: {
+            id: number;
+            business_name: string;
+        };
+        created_at: string;
+    }>;
+
+    /**
+     * Monthly commission data for the last 6 months
+     */
+    monthlyData: Array<{
+        month: string;
+        earned: number;
+        owed: number;
+    }>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -78,13 +117,14 @@ const breadcrumbs: BreadcrumbItem[] = [
  */
 export default function Dashboard({
     stats = {
-        commissions_earned_month: 0,
-        commissions_owed_month: 0,
-        active_partners_count: 0,
-        pending_referrals_count: 0,
+        commissionsEarned: { value: 0, trend: 0, isPositive: true },
+        commissionsOwed: { value: 0, trend: 0, isPositive: true },
+        activePartners: { value: 0 },
+        pendingReferrals: { value: 0 },
     },
-    top_partners = [],
-    recent_referrals = [],
+    topPartners = [],
+    recentReferrals = [],
+    monthlyData = [],
 }: DashboardProps) {
     /**
      * Format currency in Thai Baht with proper formatting
@@ -106,13 +146,18 @@ export default function Dashboard({
     };
 
     const handleLogReferral = () => {
-        // Navigate to log referral page
-        router.visit('/referrals/create');
+        // Navigate to referrals list page (create form doesn't exist yet)
+        router.visit('/referrals');
     };
 
     const handleViewPartners = () => {
         // Navigate to partners page
-        router.visit('/partners');
+        router.visit('/admin/partners');
+    };
+
+    const handleAddPartner = () => {
+        // Navigate to add partner page
+        router.visit('/admin/partners/create');
     };
 
     const handleViewAllReferrals = () => {
@@ -140,27 +185,33 @@ export default function Dashboard({
                     {/* Commissions Earned This Month */}
                     <StatCard
                         title="Earned This Month"
-                        value={formatCurrency(stats.commissions_earned_month)}
+                        value={formatCurrency(stats.commissionsEarned.value)}
                         icon={WalletIcon}
                         variant="blue"
-                        change={stats.commissions_earned_change}
+                        trend={{
+                            value: stats.commissionsEarned.trend,
+                            isPositive: stats.commissionsEarned.isPositive,
+                        }}
                         description="Total commissions received"
                     />
 
                     {/* Commissions Owed This Month */}
                     <StatCard
                         title="Owed This Month"
-                        value={formatCurrency(stats.commissions_owed_month)}
+                        value={formatCurrency(stats.commissionsOwed.value)}
                         icon={BanknoteIcon}
                         variant="orange"
-                        change={stats.commissions_owed_change}
+                        trend={{
+                            value: stats.commissionsOwed.trend,
+                            isPositive: stats.commissionsOwed.isPositive,
+                        }}
                         description="Pending payments to partners"
                     />
 
                     {/* Active Partners */}
                     <StatCard
                         title="Active Partners"
-                        value={stats.active_partners_count}
+                        value={stats.activePartners.value}
                         icon={HandshakeIcon}
                         variant="green"
                         description="Total partner relationships"
@@ -169,7 +220,7 @@ export default function Dashboard({
                     {/* Pending Referrals */}
                     <StatCard
                         title="Pending Referrals"
-                        value={stats.pending_referrals_count}
+                        value={stats.pendingReferrals.value}
                         icon={TrendingUpIcon}
                         variant="purple"
                         description="Awaiting validation"
@@ -220,7 +271,7 @@ export default function Dashboard({
                         <Card className="h-full">
                             <CardHeader className="flex flex-row items-center justify-between">
                                 <CardTitle>Top Partners</CardTitle>
-                                {top_partners.length > 0 && (
+                                {topPartners.length > 0 && (
                                     <Button
                                         variant="ghost"
                                         size="sm"
@@ -232,7 +283,7 @@ export default function Dashboard({
                                 )}
                             </CardHeader>
                             <CardContent>
-                                {top_partners.length === 0 ? (
+                                {topPartners.length === 0 ? (
                                     // Empty state
                                     <div className="flex flex-col items-center justify-center py-12 text-center">
                                         <div className="rounded-full bg-slate-100 p-4 dark:bg-slate-800">
@@ -247,7 +298,7 @@ export default function Dashboard({
                                         </p>
                                         <Button
                                             className="mt-4"
-                                            onClick={handleViewPartners}
+                                            onClick={handleAddPartner}
                                         >
                                             Add Partner
                                         </Button>
@@ -255,7 +306,7 @@ export default function Dashboard({
                                 ) : (
                                     // Partner list
                                     <div className="space-y-4">
-                                        {top_partners.map((partner, index) => (
+                                        {topPartners.map((partner, index) => (
                                             <div
                                                 key={partner.id}
                                                 className="flex items-center gap-4"
@@ -268,24 +319,27 @@ export default function Dashboard({
                                                 {/* Partner info */}
                                                 <div className="min-w-0 flex-1">
                                                     <p className="truncate font-medium text-slate-900 dark:text-white">
-                                                        {partner.name}
+                                                        {partner.business_name}
                                                     </p>
                                                     <p className="text-sm text-slate-500 dark:text-slate-500">
-                                                        {partner.type} •{' '}
-                                                        {partner.referral_count}{' '}
-                                                        {partner.referral_count ===
+                                                        {partner.business_type} •{' '}
+                                                        {partner.total_referrals}{' '}
+                                                        {partner.total_referrals ===
                                                         1
                                                             ? 'referral'
                                                             : 'referrals'}
                                                     </p>
                                                 </div>
 
-                                                {/* Commission value */}
+                                                {/* PLV value */}
                                                 <div className="text-right">
                                                     <p className="font-semibold text-blue-600 dark:text-blue-400">
                                                         {formatCurrency(
-                                                            partner.total_commission,
+                                                            partner.calculated_plv,
                                                         )}
+                                                    </p>
+                                                    <p className="text-xs text-slate-500 dark:text-slate-500">
+                                                        PLV
                                                     </p>
                                                 </div>
                                             </div>
@@ -299,7 +353,22 @@ export default function Dashboard({
                     {/* Recent Referrals - Takes 3 columns on large screens */}
                     <div className="lg:col-span-3">
                         <RecentReferralsTable
-                            referrals={recent_referrals}
+                            referrals={recentReferrals.map((ref) => ({
+                                id: ref.id,
+                                customer: ref.customer_name,
+                                service: ref.service_type,
+                                amount: ref.service_amount,
+                                commission: ref.commission_amount,
+                                status: ref.status as
+                                    | 'pending'
+                                    | 'validated'
+                                    | 'paid'
+                                    | 'disputed'
+                                    | 'cancelled',
+                                date: ref.booking_date,
+                                from: ref.referring_partner.business_name,
+                                to: ref.receiving_partner.business_name,
+                            }))}
                             onViewAll={handleViewAllReferrals}
                             maxRows={5}
                         />

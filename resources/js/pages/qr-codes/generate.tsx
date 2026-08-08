@@ -95,48 +95,42 @@ export default function QRCodeGenerate({
     qr_link,
 }: QRCodeGenerateProps) {
     const { data, setData, post, processing } = useForm({
-        partner_id: partner_id || '',
+        partner_id: partner_id?.toString() || '',
         size: '512',
         format: 'png',
         campaign_name: '',
     });
 
-    const [generatedQR, setGeneratedQR] = useState(qr_code);
-    const [generatedLink, setGeneratedLink] = useState(qr_link);
     const [copied, setCopied] = useState(false);
 
     // Find selected partner
     const selectedPartner = partners.find(
-        (p) => p.id === Number(data.partner_id),
+        (p) => p.id.toString() === data.partner_id,
     );
+
+    /**
+     * Sync QR code and link from props (updated after generation)
+     */
+    useEffect(() => {
+        // Props are automatically updated by Inertia after form submission
+    }, [qr_code, qr_link]);
 
     /**
      * Handle form submission to generate QR code
      */
     const handleGenerate = (e: FormEvent) => {
         e.preventDefault();
-
-        post('/qr-codes/generate', {
-            onSuccess: (page: any) => {
-                // Update generated QR code and link
-                if (page.props.qr_code) {
-                    setGeneratedQR(page.props.qr_code);
-                }
-                if (page.props.qr_link) {
-                    setGeneratedLink(page.props.qr_link);
-                }
-            },
-        });
+        post('/qr-codes/generate');
     };
 
     /**
      * Handle download QR code
      */
     const handleDownload = () => {
-        if (!generatedQR || !selectedPartner) return;
+        if (!qr_code || !selectedPartner) return;
 
         const link = document.createElement('a');
-        link.href = generatedQR;
+        link.href = qr_code;
         link.download = `${selectedPartner.name.replace(/\s+/g, '-')}-QR-${data.size}.${data.format}`;
         link.click();
     };
@@ -145,10 +139,10 @@ export default function QRCodeGenerate({
      * Handle copy link to clipboard
      */
     const handleCopyLink = async () => {
-        if (!generatedLink) return;
+        if (!qr_link) return;
 
         try {
-            await navigator.clipboard.writeText(generatedLink);
+            await navigator.clipboard.writeText(qr_link);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
@@ -160,13 +154,13 @@ export default function QRCodeGenerate({
      * Handle email share
      */
     const handleEmailShare = () => {
-        if (!generatedLink || !selectedPartner) return;
+        if (!qr_link || !selectedPartner) return;
 
         const subject = encodeURIComponent(
             `Referral Link for ${selectedPartner.name}`,
         );
         const body = encodeURIComponent(
-            `Hi,\n\nHere's your referral tracking link for ${selectedPartner.name}:\n\n${generatedLink}\n\nShare this with customers to track commissions automatically.\n\nBest regards,\nTrackly`,
+            `Hi,\n\nHere's your referral tracking link for ${selectedPartner.name}:\n\n${qr_link}\n\nShare this with customers to track commissions automatically.\n\nBest regards,\nTrackly`,
         );
 
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
@@ -176,7 +170,7 @@ export default function QRCodeGenerate({
      * Auto-generate QR code when partner is pre-selected
      */
     useEffect(() => {
-        if (partner_id && !generatedQR) {
+        if (partner_id && !qr_code) {
             // Auto-submit form to generate QR
             handleGenerate(new Event('submit') as any);
         }
@@ -219,7 +213,7 @@ export default function QRCodeGenerate({
                                             onValueChange={(value) =>
                                                 setData(
                                                     'partner_id',
-                                                    Number(value),
+                                                    value,
                                                 )
                                             }
                                             required
@@ -333,7 +327,7 @@ export default function QRCodeGenerate({
                                         <QrCodeIcon className="mr-2 size-5" />
                                         {processing
                                             ? 'Generating...'
-                                            : generatedQR
+                                            : qr_code
                                               ? 'Regenerate QR Code'
                                               : 'Generate QR Code'}
                                     </Button>
@@ -347,16 +341,16 @@ export default function QRCodeGenerate({
                         <Card className="sticky top-6">
                             <CardHeader>
                                 <CardTitle>
-                                    {generatedQR ? 'Your QR Code' : 'Preview'}
+                                    {qr_code ? 'Your QR Code' : 'Preview'}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {generatedQR && selectedPartner ? (
+                                {qr_code && selectedPartner ? (
                                     <div className="space-y-6">
                                         {/* QR Code Preview */}
                                         <div className="flex flex-col items-center rounded-lg border-2 border-dashed border-slate-200 bg-white p-8 dark:border-slate-800 dark:bg-slate-900">
                                             <img
-                                                src={generatedQR}
+                                                src={qr_code}
                                                 alt={`QR Code for ${selectedPartner.name}`}
                                                 className="size-64 rounded-lg"
                                             />
@@ -372,14 +366,14 @@ export default function QRCodeGenerate({
                                         </div>
 
                                         {/* Link Display */}
-                                        {generatedLink && (
+                                        {qr_link && (
                                             <div className="rounded-lg bg-slate-50 p-4 dark:bg-slate-900">
                                                 <Label className="mb-2 block text-xs">
                                                     Tracking Link
                                                 </Label>
                                                 <div className="flex items-center gap-2">
                                                     <Input
-                                                        value={generatedLink}
+                                                        value={qr_link}
                                                         readOnly
                                                         className="bg-white dark:bg-slate-950"
                                                     />

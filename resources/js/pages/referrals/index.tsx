@@ -22,23 +22,55 @@ import {
     TrendingUpIcon,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 /**
  * Referrals Index page props
  */
 interface ReferralsIndexProps {
     /**
-     * All referrals
+     * Paginated referrals
      */
-    referrals: Referral[];
+    referrals: {
+        data: Referral[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    };
+
+    /**
+     * Summary statistics
+     */
+    stats: {
+        total: number;
+        pending: number;
+        validated: number;
+        paid: number;
+        total_commission: number;
+    };
+
+    /**
+     * User's partners for create form
+     */
+    partners: Array<{
+        id: number;
+        business_name: string;
+        business_type: string;
+        default_commission_rate: number;
+    }>;
 
     /**
      * Filters applied (from query params)
      */
     filters?: {
+        tab?: 'received' | 'sent' | 'all';
         search?: string;
         status?: string;
-        direction?: 'received' | 'sent' | 'all';
+        date_from?: string;
+        date_to?: string;
+        sort_by?: string;
+        sort_order?: string;
     };
 }
 
@@ -83,12 +115,14 @@ const STATUS_OPTIONS = [
  * - Empty states with helpful CTAs
  */
 export default function ReferralsIndex({
-    referrals = [],
+    referrals,
+    stats,
+    partners,
     filters = {},
 }: ReferralsIndexProps) {
     // Direction tab state
     const [activeTab, setActiveTab] = useState<'received' | 'sent' | 'all'>(
-        filters.direction || 'all',
+        filters.tab || 'all',
     );
 
     // Filter states
@@ -98,7 +132,7 @@ export default function ReferralsIndex({
     );
 
     // Bulk selection state
-    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
     /**
      * Format currency in Thai Baht
@@ -150,47 +184,40 @@ export default function ReferralsIndex({
     };
 
     /**
-     * Filter referrals based on tab, search, and status
+     * Since filtering is now handled by backend, we just use the data directly
+     * Client-side filtering is commented out but kept for reference
      */
-    const filteredReferrals = referrals.filter((referral) => {
-        // Tab filter (placeholder - would be handled by backend in real app)
-        // For demo purposes, we're showing all
-
-        // Search filter
-        const matchesSearch =
-            !searchQuery ||
-            referral.customer_name
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            referral.partner_name
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            referral.service_type
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase());
-
-        // Status filter
-        const matchesStatus =
-            statusFilter === 'All Statuses' ||
-            referral.status.toLowerCase() === statusFilter.toLowerCase();
-
-        return matchesSearch && matchesStatus;
-    });
+    const filteredReferrals = referrals.data;
 
     /**
      * Handle tab change
      */
     const handleTabChange = (tab: 'received' | 'sent' | 'all') => {
         setActiveTab(tab);
-        // TODO: Update URL with Inertia router
+        router.get(
+            '/referrals',
+            { tab, status: statusFilter !== 'All Statuses' ? statusFilter.toLowerCase() : undefined, search: searchQuery || undefined },
+            { preserveState: true, preserveScroll: true }
+        );
     };
+
+    /**
+     * Debounced search handler
+     */
+    const debouncedSearch = useDebouncedCallback((query: string) => {
+        router.get(
+            '/referrals',
+            { search: query || undefined, tab: activeTab, status: statusFilter !== 'All Statuses' ? statusFilter.toLowerCase() : undefined },
+            { preserveState: true, preserveScroll: true }
+        );
+    }, 500);
 
     /**
      * Handle search
      */
     const handleSearch = (query: string) => {
         setSearchQuery(query);
-        // TODO: Debounced search with Inertia
+        debouncedSearch(query);
     };
 
     /**
@@ -198,7 +225,11 @@ export default function ReferralsIndex({
      */
     const handleStatusChange = (status: string) => {
         setStatusFilter(status);
-        // TODO: Update URL with Inertia router
+        router.get(
+            '/referrals',
+            { status: status !== 'All Statuses' ? status.toLowerCase() : undefined, tab: activeTab, search: searchQuery || undefined },
+            { preserveState: true, preserveScroll: true }
+        );
     };
 
     /**
@@ -250,7 +281,7 @@ export default function ReferralsIndex({
     };
 
     // Empty state - No referrals
-    if (referrals.length === 0) {
+    if (referrals.data.length === 0) {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Referrals" />

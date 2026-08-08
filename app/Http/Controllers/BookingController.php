@@ -103,6 +103,35 @@ class BookingController extends Controller
         // Create booking
         $booking = Booking::create($validated);
 
+        // Create referral if tracking link exists
+        if ($trackingLink && $partner) {
+            // Find receiving partner (the one providing the service)
+            // For now, we'll assume the partner is the one receiving the booking
+            $receivingPartner = $partner;
+
+            // Create referral record
+            \App\Models\Referral::create([
+                'tracking_link_id' => $trackingLink->id,
+                'referring_partner_id' => $partner->id, // Partner who referred
+                'receiving_partner_id' => $receivingPartner->id, // Partner receiving the booking
+                'user_id' => $partner->user_id,
+                'customer_name' => $validated['customer_name'],
+                'customer_email' => $validated['customer_email'],
+                'customer_phone' => $validated['customer_phone'] ?? null,
+                'service_type' => $validated['service_type'],
+                'service_description' => $validated['service_description'] ?? null,
+                'booking_date' => $validated['booking_date'],
+                'service_date' => $validated['service_date'],
+                'service_amount' => $validated['amount'],
+                'commission_rate' => $validated['commission_rate'],
+                'commission_type' => 'percentage',
+                'status' => 'pending',
+            ]);
+
+            // Record conversion on tracking link
+            $trackingLink->recordConversion($validated['amount']);
+        }
+
         // Return response based on request type
         if ($request->expectsJson()) {
             return response()->json([

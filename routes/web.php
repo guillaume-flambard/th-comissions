@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TrackingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,9 +24,24 @@ Route::get('/booking/success/{bookingReference}', [BookingController::class, 'su
 Route::post('/api/booking/update-status', [BookingController::class, 'updateStatus'])->name('api.booking.update-status');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/api/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
+
+    // QR Code generation
+    Route::get('/qr-codes/generate', [\App\Http\Controllers\QRCodeController::class, 'show'])->name('qr-codes.generate');
+    Route::post('/qr-codes/generate', [\App\Http\Controllers\QRCodeController::class, 'generate'])->name('qr-codes.store');
+    Route::get('/qr-codes/{trackingLink}/download', [\App\Http\Controllers\QRCodeController::class, 'download'])->name('qr-codes.download');
+    Route::get('/qr-codes/{trackingLink}/stats', [\App\Http\Controllers\QRCodeController::class, 'stats'])->name('qr-codes.stats');
+
+    // Referral management
+    Route::get('/referrals', [\App\Http\Controllers\ReferralController::class, 'index'])->name('referrals.index');
+    Route::get('/referrals/create', [\App\Http\Controllers\ReferralController::class, 'create'])->name('referrals.create');
+    Route::post('/referrals', [\App\Http\Controllers\ReferralController::class, 'store'])->name('referrals.store');
+    Route::put('/referrals/{referral}', [\App\Http\Controllers\ReferralController::class, 'update'])->name('referrals.update');
+    Route::post('/referrals/mark-as-paid', [\App\Http\Controllers\ReferralController::class, 'markAsPaid'])->name('referrals.mark-as-paid');
+    Route::post('/referrals/{referral}/validate', [\App\Http\Controllers\ReferralController::class, 'markAsValidated'])->name('referrals.validate');
+    Route::post('/referrals/{referral}/dispute', [\App\Http\Controllers\ReferralController::class, 'markAsDisputed'])->name('referrals.dispute');
+    Route::post('/referrals/{referral}/cancel', [\App\Http\Controllers\ReferralController::class, 'cancel'])->name('referrals.cancel');
 });
 
 require __DIR__.'/settings.php';

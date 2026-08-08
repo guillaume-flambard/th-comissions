@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePartnerRequest;
+use App\Http\Requests\UpdatePartnerRequest;
 use App\Models\Partner;
 use App\Models\PartnerTier;
 use App\Models\User;
@@ -20,222 +22,274 @@ class PartnerController extends Controller
     public function index(Request $request)
     {
         $query = Partner::with('tier')
-            ->withCount('bookings', 'commissions');
+            ->where('user_id', auth()->id())
+            ->withCount(['referralsSent', 'referralsReceived']);
 
-        // Filters
-        if ($request->filled('tier')) {
-            $query->whereHas('tier', fn($q) => $q->where('slug', $request->tier));
-        }
-
-        if ($request->filled('business_type')) {
-            $query->where('business_type', $request->business_type);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('is_active', $request->status === 'active');
-        }
-
+        // Search
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('business_name', 'like', "%{$request->search}%")
+                    ->orWhere('contact_name', 'like', "%{$request->search}%")
                     ->orWhere('email', 'like', "%{$request->search}%");
             });
         }
 
+        // Filter by business type
+        if ($request->filled('business_type')) {
+            $query->where('business_type', $request->business_type);
+        }
+
+        // Filter by status (active/inactive)
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
+        }
+
         // Sorting
-        $sortBy = $request->get('sort_by', 'calculated_plv');
+        $sortBy = $request->get('sort_by', 'created_at');
         $sortDir = $request->get('sort_dir', 'desc');
         $query->orderBy($sortBy, $sortDir);
 
-        $partners = $query->paginate(20)->through(function ($partner) {
+        $partners = $query->paginate(15)->through(function ($partner) {
             return [
                 'id' => $partner->id,
                 'business_name' => $partner->business_name,
                 'business_type' => $partner->business_type,
+                'contact_name' => $partner->contact_name,
                 'email' => $partner->email,
                 'phone' => $partner->phone,
-                'calculated_plv' => $partner->calculated_plv,
-                'total_revenue_generated' => $partner->total_revenue_generated,
-                'total_referrals' => $partner->total_referrals,
-                'conversion_rate' => $partner->conversion_rate,
-                'engagement_score' => $partner->engagement_score,
+                'city' => $partner->city ?? '',
+                'calculated_plv' => $partner->calculated_plv ?? 0,
+                'total_commissions_paid' => $partner->total_commissions_paid ?? 0,
+                'total_referrals' => $partner->total_referrals ?? 0,
+                'successful_conversions' => $partner->successful_conversions ?? 0,
+                'conversion_rate' => $partner->conversion_rate ?? 0,
+                'total_revenue_generated' => $partner->total_revenue_generated ?? 0,
+                'engagement_score' => $partner->engagement_score ?? 0,
+                'churn_rate' => $partner->churn_rate ?? 0,
                 'is_active' => $partner->is_active,
                 'last_referral_at' => $partner->last_referral_at?->format('Y-m-d'),
+                'joined_at' => $partner->created_at?->format('Y-m-d'),
                 'tier' => $partner->tier ? [
+                    'id' => $partner->tier->id,
                     'name' => $partner->tier->name,
                     'slug' => $partner->tier->slug,
                     'color' => $partner->tier->color,
                 ] : null,
-                'bookings_count' => $partner->bookings_count,
-                'commissions_count' => $partner->commissions_count,
+                'referrals_sent_count' => $partner->referrals_sent_count,
+                'referrals_received_count' => $partner->referrals_received_count,
             ];
         });
 
-        $tiers = PartnerTier::ordered()->get();
-        $businessTypes = ['hotel', 'hostel', 'tour_operator', 'diving_shop', 'transport', 'dmo', 'restaurant'];
+        $businessTypes = [
+            'dive_shop',
+            'kite_school',
+            'hostel',
+            'hotel',
+            'tour_operator',
+            'transfer_service',
+        ];
+
+        $tiers = PartnerTier::all();
 
         return Inertia::render('admin/partners/index', [
             'partners' => $partners,
-            'tiers' => $tiers,
             'businessTypes' => $businessTypes,
-            'filters' => $request->only(['tier', 'business_type', 'status', 'search', 'sort_by', 'sort_dir']),
+            'tiers' => $tiers,
+            'filters' => $request->only(['business_type', 'status', 'search', 'sort_by', 'sort_dir']),
         ]);
     }
 
     public function show(Partner $partner)
     {
+        // Authorize: check partner belongs to auth user
+        if ($partner->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $partner->load(['tier', 'trackingLinks', 'user']);
 
-        $recentBookings = $partner->bookings()
-            ->with('trackingLink')
+        // Load recent referrals sent (last 10)
+        $referralsSent = $partner->referralsSent()
+            ->with(['receivingPartner', 'trackingLink'])
             ->latest()
-            ->limit(20)
+            ->limit(10)
             ->get();
 
-        $commissions = $partner->commissions()
-            ->with('booking')
+        // Load recent referrals received (last 10)
+        $referralsReceived = $partner->referralsReceived()
+            ->with(['referringPartner', 'trackingLink'])
             ->latest()
-            ->limit(20)
+            ->limit(10)
             ->get();
 
-        // Calculate metrics
-        $metrics = [
-            'arpp' => $partner->calculateARPP(),
-            'apl' => $partner->calculateAPL(),
-            'churn_rate' => $partner->calculateChurnRate(),
-            'plv' => $partner->calculated_plv,
-            'partnership_costs' => $partner->calculatePartnershipCosts(),
+        // Calculate stats for the partner show page
+        $totalPaid = $partner->referralsReceived()
+            ->where('status', 'paid')
+            ->sum('commission_amount') ?? 0;
+
+        $totalReceived = $partner->referralsSent()
+            ->where('status', 'paid')
+            ->sum('commission_amount') ?? 0;
+
+        $paidReferralsCount = $partner->referralsSent()
+            ->where('status', 'paid')
+            ->count();
+
+        $avgCommissionPerReferral = $paidReferralsCount > 0
+            ? $totalReceived / $paidReferralsCount
+            : 0;
+
+        $pendingPayments = $partner->referralsSent()
+            ->whereIn('status', ['pending', 'validated'])
+            ->sum('commission_amount') ?? 0;
+
+        $stats = [
+            'total_paid' => $totalPaid,
+            'total_received' => $totalReceived,
+            'avg_commission_per_referral' => $avgCommissionPerReferral,
+            'pending_payments' => $pendingPayments,
         ];
 
         return Inertia::render('admin/partners/show', [
             'partner' => $partner,
-            'recentBookings' => $recentBookings,
-            'commissions' => $commissions,
-            'metrics' => $metrics,
+            'referralsSent' => $referralsSent,
+            'referralsReceived' => $referralsReceived,
+            'stats' => $stats,
         ]);
     }
 
     public function create()
     {
-        $tiers = PartnerTier::ordered()->get();
-        $businessTypes = ['hotel', 'hostel', 'tour_operator', 'diving_shop', 'transport', 'dmo', 'restaurant'];
-        $currencies = ['THB', 'USD', 'EUR'];
-        $paymentMethods = ['manual', 'stripe', 'promptpay', 'bank_transfer'];
+        $businessTypes = [
+            'Dive Shop',
+            'Kite School',
+            'Hostel',
+            'Hotel',
+            'Tour Operator',
+            'Transfer Service',
+        ];
+
+        $commissionStructures = [
+            'percentage' => 'Percentage-based',
+            'fixed' => 'Fixed amount',
+            'tiered' => 'Tiered (volume-based)',
+        ];
 
         return Inertia::render('admin/partners/create', [
-            'tiers' => $tiers,
             'businessTypes' => $businessTypes,
-            'currencies' => $currencies,
-            'paymentMethods' => $paymentMethods,
+            'commissionStructures' => $commissionStructures,
+            'defaultCommissionRate' => 15, // Default 15% commission
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StorePartnerRequest $request)
     {
-        $validated = $request->validate([
-            'business_name' => 'required|string|max:255',
-            'business_type' => 'required|string',
-            'contact_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:partners,email',
-            'phone' => 'nullable|string|max:50',
-            'address' => 'nullable|string',
-            'city' => 'nullable|string|max:255',
-            'country' => 'nullable|string|max:2',
-            'website' => 'nullable|url',
-            'commission_structure' => 'required|in:percentage,fixed,tiered',
-            'default_commission_rate' => 'required|numeric|min:0|max:100',
-            'payment_method' => 'required|string',
-            'payment_currency' => 'required|string|in:THB,USD,EUR',
-            'bank_name' => 'nullable|string',
-            'bank_account_number' => 'nullable|string',
-            'promptpay_id' => 'nullable|string',
-            'create_user_account' => 'boolean',
-            'user_password' => 'required_if:create_user_account,true|nullable|min:8',
-        ]);
+        $validated = $request->validated();
 
+        // Create partner for authenticated user
         $partner = Partner::create(array_merge($validated, [
+            'user_id' => auth()->id(),
             'joined_at' => now(),
+            'is_active' => $validated['is_active'] ?? true,
+            'payment_currency' => $validated['payment_currency'] ?? 'THB',
         ]));
 
-        // Create user account if requested
-        if ($request->boolean('create_user_account')) {
-            $user = User::create([
-                'name' => $validated['contact_name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($request->user_password),
+        // Generate default QR code if QRCodeService is available
+        try {
+            $this->qrCodeService->generateForPartner($partner);
+        } catch (\Exception $e) {
+            // QR code generation failed, but partner was created successfully
+            // Log the error but don't fail the request
+            logger()->warning('QR code generation failed for partner: ' . $partner->id, [
+                'error' => $e->getMessage(),
             ]);
-
-            $partner->update(['user_id' => $user->id]);
         }
 
-        // Generate default QR code
-        $this->qrCodeService->generateForPartner($partner);
-
         return redirect()->route('admin.partners.show', $partner)
-            ->with('success', 'Partner created successfully.');
+            ->with('success', 'Partner created successfully!');
     }
 
     public function edit(Partner $partner)
     {
-        $tiers = PartnerTier::ordered()->get();
-        $businessTypes = ['hotel', 'hostel', 'tour_operator', 'diving_shop', 'transport', 'dmo', 'restaurant'];
-        $currencies = ['THB', 'USD', 'EUR'];
-        $paymentMethods = ['manual', 'stripe', 'promptpay', 'bank_transfer'];
+        // Authorize: check partner belongs to auth user
+        if ($partner->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $businessTypes = [
+            'Dive Shop',
+            'Kite School',
+            'Hostel',
+            'Hotel',
+            'Tour Operator',
+            'Transfer Service',
+        ];
+
+        $commissionStructures = [
+            'percentage' => 'Percentage-based',
+            'fixed' => 'Fixed amount',
+            'tiered' => 'Tiered (volume-based)',
+        ];
 
         return Inertia::render('admin/partners/edit', [
             'partner' => $partner,
-            'tiers' => $tiers,
             'businessTypes' => $businessTypes,
-            'currencies' => $currencies,
-            'paymentMethods' => $paymentMethods,
+            'commissionStructures' => $commissionStructures,
         ]);
     }
 
-    public function update(Request $request, Partner $partner)
+    public function update(UpdatePartnerRequest $request, Partner $partner)
     {
-        $validated = $request->validate([
-            'business_name' => 'required|string|max:255',
-            'business_type' => 'required|string',
-            'contact_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:partners,email,' . $partner->id,
-            'phone' => 'nullable|string|max:50',
-            'address' => 'nullable|string',
-            'city' => 'nullable|string|max:255',
-            'website' => 'nullable|url',
-            'commission_structure' => 'required|in:percentage,fixed,tiered',
-            'default_commission_rate' => 'required|numeric|min:0|max:100',
-            'payment_method' => 'required|string',
-            'payment_currency' => 'required|string|in:THB,USD,EUR',
-            'is_active' => 'boolean',
-            'notes' => 'nullable|string',
-        ]);
+        // Authorize: check partner belongs to auth user
+        if ($partner->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
 
+        $validated = $request->validated();
         $partner->update($validated);
 
         return redirect()->route('admin.partners.show', $partner)
-            ->with('success', 'Partner updated successfully.');
+            ->with('success', 'Partner updated successfully!');
     }
 
     public function destroy(Partner $partner)
     {
+        // Authorize: check partner belongs to auth user
+        if ($partner->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $partner->delete();
 
         return redirect()->route('admin.partners.index')
-            ->with('success', 'Partner deleted successfully.');
+            ->with('success', 'Partner deleted successfully!');
     }
 
     public function recalculatePlv(Partner $partner)
     {
+        // Authorize: check partner belongs to auth user
+        if ($partner->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $plv = $partner->calculatePLV();
         $partner->updateEngagementScore();
 
-        return back()->with('success', "PLV recalculated: " . number_format($plv, 2));
+        return back()->with('success', "PLV recalculated: " . number_format($plv, 2) . " THB");
     }
 
     public function generateQrCode(Partner $partner)
     {
-        $path = $this->qrCodeService->generateForPartner($partner);
+        // Authorize: check partner belongs to auth user
+        if ($partner->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
 
-        return back()->with('success', 'QR Code generated successfully.');
+        try {
+            $path = $this->qrCodeService->generateForPartner($partner);
+            return back()->with('success', 'QR Code generated successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to generate QR Code: ' . $e->getMessage());
+        }
     }
 }

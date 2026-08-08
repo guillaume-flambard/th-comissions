@@ -41,13 +41,36 @@ class PartnerFactory extends Factory
         ];
 
         $businessTypes = ['travel_agency', 'tour_operator', 'hotel', 'activity_provider', 'transportation'];
-        $commissionStructures = ['percentage', 'fixed', 'tiered'];
+        $commissionStructure = fake()->randomElement(['percentage', 'fixed', 'tiered']);
         $paymentMethods = ['bank_transfer', 'promptpay', 'stripe'];
         $currencies = ['THB', 'USD'];
 
+        // Set commission fields based on structure
+        $commissionData = match($commissionStructure) {
+            'percentage' => [
+                'default_commission_rate' => fake()->randomFloat(2, 10, 20),
+                'fixed_commission_amount' => null,
+                'tiered_commission_rules' => null,
+            ],
+            'fixed' => [
+                'default_commission_rate' => 0, // Set to 0 instead of null for NOT NULL constraint
+                'fixed_commission_amount' => 500.00,
+                'tiered_commission_rules' => null,
+            ],
+            'tiered' => [
+                'default_commission_rate' => 0, // Set to 0 instead of null for NOT NULL constraint
+                'fixed_commission_amount' => null,
+                'tiered_commission_rules' => [
+                    ['min_amount' => 0, 'max_amount' => 10000, 'rate' => 10.00],
+                    ['min_amount' => 10001, 'max_amount' => 50000, 'rate' => 15.00],
+                    ['min_amount' => 50001, 'max_amount' => null, 'rate' => 20.00],
+                ],
+            ],
+        };
+
         return [
             'user_id' => User::factory(),
-            'partner_tier_id' => PartnerTier::factory(),
+            'partner_tier_id' => PartnerTier::inRandomOrder()->first()?->id ?? null,
             'business_name' => fake()->randomElement($thaiBusinessNames),
             'business_type' => fake()->randomElement($businessTypes),
             'contact_name' => fake()->name(),
@@ -57,10 +80,8 @@ class PartnerFactory extends Factory
             'city' => fake()->randomElement(['Bangkok', 'Chiang Mai', 'Phuket', 'Pattaya', 'Krabi', 'Koh Samui']),
             'country' => 'Thailand',
             'website' => fake()->optional()->url(),
-            'commission_structure' => fake()->randomElement($commissionStructures),
-            'default_commission_rate' => fake()->randomFloat(2, 10, 20),
-            'fixed_commission_amount' => null,
-            'tiered_commission_rules' => null,
+            'commission_structure' => $commissionStructure,
+            ...$commissionData,
             'payment_method' => fake()->randomElement($paymentMethods),
             'payment_currency' => fake()->randomElement($currencies),
             'stripe_account_id' => null,
@@ -103,7 +124,7 @@ class PartnerFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'commission_structure' => 'fixed',
-            'default_commission_rate' => null,
+            'default_commission_rate' => 0, // Set to 0 for NOT NULL constraint
             'fixed_commission_amount' => 500.00,
             'tiered_commission_rules' => null,
         ]);
@@ -116,7 +137,7 @@ class PartnerFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'commission_structure' => 'tiered',
-            'default_commission_rate' => null,
+            'default_commission_rate' => 0, // Set to 0 for NOT NULL constraint
             'fixed_commission_amount' => null,
             'tiered_commission_rules' => [
                 ['min_amount' => 0, 'max_amount' => 10000, 'rate' => 10.00],

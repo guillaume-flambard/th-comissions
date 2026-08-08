@@ -29,8 +29,8 @@ class TrackingLinkFactory extends Factory
             'partner_id' => Partner::factory(),
             'unique_code' => strtoupper(Str::random(6)),
             'utm_source' => null, // Will be auto-populated from partner
-            'utm_medium' => fake()->randomElement($utmMediums),
-            'utm_campaign' => fake()->optional()->randomElement($utmCampaigns),
+            'utm_medium' => fake()->randomElement($utmMediums) ?: 'referral', // Ensure not null
+            'utm_campaign' => fake()->randomElement($utmCampaigns) ?: 'general',
             'utm_content' => fake()->optional()->word(),
             'link_type' => fake()->randomElement($linkTypes),
             'target_url' => fake()->optional()->url(),

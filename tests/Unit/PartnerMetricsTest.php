@@ -43,7 +43,8 @@ describe('Partner Lifetime Value (PLV) Calculations', function () {
 
         expect($plv)->toBeFloat();
         expect($plv)->toBeGreaterThan(0);
-        expect($partner->calculated_plv)->toBe($plv);
+        // calculated_plv is stored as decimal, returns string
+        expect((float)$partner->calculated_plv)->toBe($plv);
     });
 
     test('PLV formula matches (ARPP - Costs) × APL', function () {
@@ -313,7 +314,7 @@ describe('Conversion Rate Calculations', function () {
 
         $partner->updateConversionRate();
 
-        expect($partner->conversion_rate)->toBe(75.00);
+        expect($partner->conversion_rate)->toBe('75.00');
     });
 
     test('handles 100% conversion rate', function () {
@@ -324,7 +325,7 @@ describe('Conversion Rate Calculations', function () {
 
         $partner->updateConversionRate();
 
-        expect($partner->conversion_rate)->toBe(100.00);
+        expect($partner->conversion_rate)->toBe('100.00');
     });
 
     test('handles 0% conversion rate', function () {
@@ -335,7 +336,7 @@ describe('Conversion Rate Calculations', function () {
 
         $partner->updateConversionRate();
 
-        expect($partner->conversion_rate)->toBe(0.00);
+        expect($partner->conversion_rate)->toBe('0.00');
     });
 
     test('does not update when no referrals', function () {
@@ -347,7 +348,7 @@ describe('Conversion Rate Calculations', function () {
 
         $partner->updateConversionRate();
 
-        expect($partner->conversion_rate)->toBe(0.00);
+        expect($partner->conversion_rate)->toBe('0.00');
     });
 });
 
@@ -434,7 +435,7 @@ describe('Partner Metrics Update on Booking Completion', function () {
 
         expect($partner->total_referrals)->toBe(1);
         expect($partner->successful_conversions)->toBe(1);
-        expect($partner->total_revenue_generated)->toBe(10000.00);
+        expect($partner->total_revenue_generated)->toBe('10000.00');
         expect($partner->last_referral_at)->not->toBeNull();
     });
 
@@ -456,7 +457,7 @@ describe('Partner Metrics Update on Booking Completion', function () {
 
         expect($partner->total_referrals)->toBe(6);
         expect($partner->successful_conversions)->toBe(5);
-        expect($partner->total_revenue_generated)->toBe(30000.00);
+        expect($partner->total_revenue_generated)->toBe('30000.00');
     });
 });
 
@@ -478,10 +479,10 @@ describe('Average Commission Per Referral', function () {
     test('calculates average commission per referral', function () {
         $partner = Partner::factory()->create();
 
-        // Create 5 bookings with commissions
-        Booking::factory()
+        // Create 5 confirmed bookings and complete them to trigger commission creation
+        $bookings = Booking::factory()
             ->count(5)
-            ->completed()
+            ->confirmed()
             ->create([
                 'partner_id' => $partner->id,
                 'amount' => 10000.00,
@@ -489,6 +490,9 @@ describe('Average Commission Per Referral', function () {
                 'commission_structure' => 'percentage',
                 'commission_amount' => 1500.00,
             ]);
+
+        // Complete each booking to trigger commission creation
+        $bookings->each->complete();
 
         $totalCommissions = $partner->commissions()->sum('amount');
         $totalReferrals = $partner->bookings()->completed()->count();

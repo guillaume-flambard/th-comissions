@@ -31,7 +31,7 @@ describe('Partner Creation', function () {
         expect($partner)->toBeInstanceOf(Partner::class);
         expect($partner->business_name)->toBe('Amazing Thailand Tours');
         expect($partner->business_type)->toBe('tour_operator');
-        expect($partner->default_commission_rate)->toBe(15.00);
+        expect($partner->default_commission_rate)->toBe('15.00');
         expect($partner->is_active)->toBeTrue();
     });
 
@@ -110,8 +110,8 @@ describe('Partner Validation', function () {
         $partner1 = Partner::factory()->create(['default_commission_rate' => 0.00]);
         $partner2 = Partner::factory()->create(['default_commission_rate' => 100.00]);
 
-        expect($partner1->default_commission_rate)->toBe(0.00);
-        expect($partner2->default_commission_rate)->toBe(100.00);
+        expect($partner1->default_commission_rate)->toBe('0.00');
+        expect($partner2->default_commission_rate)->toBe('100.00');
     });
 });
 
@@ -120,7 +120,7 @@ describe('Partner Commission Structures', function () {
         $partner = Partner::factory()->percentage()->create();
 
         expect($partner->commission_structure)->toBe('percentage');
-        expect($partner->default_commission_rate)->toBe(15.00);
+        expect($partner->default_commission_rate)->toBe('15.00');
         expect($partner->fixed_commission_amount)->toBeNull();
     });
 
@@ -128,7 +128,7 @@ describe('Partner Commission Structures', function () {
         $partner = Partner::factory()->fixed()->create();
 
         expect($partner->commission_structure)->toBe('fixed');
-        expect($partner->fixed_commission_amount)->toBe(500.00);
+        expect($partner->fixed_commission_amount)->toBe('500.00');
     });
 
     test('supports tiered commission structure', function () {
@@ -175,7 +175,7 @@ describe('Partner Update', function () {
             'default_commission_rate' => 18.00,
         ]);
 
-        expect($partner->fresh()->default_commission_rate)->toBe(18.00);
+        expect($partner->fresh()->default_commission_rate)->toBe('18.00');
     });
 
     test('updates partner tier', function () {
@@ -212,11 +212,12 @@ describe('Partner Update', function () {
 describe('Partner Soft Deletion', function () {
     test('soft deletes partner', function () {
         $partner = Partner::factory()->create();
+        $partnerId = $partner->id;
 
         $partner->delete();
 
-        expect($partner->fresh())->toBeNull();
-        expect(Partner::withTrashed()->find($partner->id))->not->toBeNull();
+        expect(Partner::find($partnerId))->toBeNull();
+        expect(Partner::withTrashed()->find($partnerId))->not->toBeNull();
     });
 
     test('soft deleted partners are excluded from queries', function () {
@@ -231,12 +232,13 @@ describe('Partner Soft Deletion', function () {
 
     test('can restore soft deleted partner', function () {
         $partner = Partner::factory()->create();
+        $partnerId = $partner->id;
 
         $partner->delete();
-        expect($partner->fresh())->toBeNull();
+        expect(Partner::find($partnerId))->toBeNull();
 
         $partner->restore();
-        expect($partner->fresh())->not->toBeNull();
+        expect(Partner::find($partnerId))->not->toBeNull();
     });
 });
 
@@ -346,7 +348,7 @@ describe('Partner Queries and Scopes', function () {
 
         $topPartner = Partner::topPerformers(1)->first();
 
-        expect($topPartner->calculated_plv)->toBe(500000.00);
+        expect($topPartner->calculated_plv)->toBe('500000.00');
     });
 
     test('identifies at-risk partners', function () {
@@ -448,13 +450,13 @@ describe('Partner Metrics Initialization', function () {
     test('new partner has zero metrics', function () {
         $partner = Partner::factory()->create();
 
-        expect($partner->total_revenue_generated)->toBe(0.00);
-        expect($partner->total_commissions_paid)->toBe(0.00);
-        expect($partner->calculated_plv)->toBe(0.00);
-        expect($partner->engagement_score)->toBe(0.00);
+        expect($partner->total_revenue_generated)->toBe('0.00');
+        expect($partner->total_commissions_paid)->toBe('0.00');
+        expect($partner->calculated_plv)->toBe('0.00');
+        expect($partner->engagement_score)->toBe('0.00');
         expect($partner->total_referrals)->toBe(0);
         expect($partner->successful_conversions)->toBe(0);
-        expect($partner->conversion_rate)->toBe(0.00);
+        expect($partner->conversion_rate)->toBe('0.00');
     });
 });
 

@@ -136,7 +136,7 @@ describe('Calculate Total Commission Owed to Partner', function () {
             ->unpaid()
             ->sum('amount');
 
-        expect($totalOwed)->toBe(2500.00);
+        expect((float)$totalOwed)->toBe(2500.00);
     });
 
     test('calculates commissions owed for specific period', function () {
@@ -161,7 +161,7 @@ describe('Calculate Total Commission Owed to Partner', function () {
             ->inPeriod($startDate, $endDate)
             ->sum('amount');
 
-        expect($periodTotal)->toBe(1200.00);
+        expect((float)$periodTotal)->toBe(1200.00);
     });
 });
 
@@ -230,7 +230,7 @@ describe('Batch Commission Payments', function () {
 
         $batchTotal = Commission::inBatch($batchId)->sum('amount');
 
-        expect($batchTotal)->toBe(4500.00);
+        expect((float)$batchTotal)->toBe(4500.00);
     });
 });
 
@@ -315,7 +315,7 @@ describe('Withholding Tax Calculation', function () {
         $totalWithholding = $totalCommissions * 0.03;
         $netPayment = $totalCommissions - $totalWithholding;
 
-        expect($totalCommissions)->toBe(3000.00);
+        expect((float)$totalCommissions)->toBe(3000.00);
         expect($totalWithholding)->toBe(90.00);
         expect($netPayment)->toBe(2910.00);
     });
@@ -335,7 +335,7 @@ describe('Partner Total Commissions Paid Update', function () {
         $user = User::factory()->create();
         $commission->markAsPaid($user->id, 'bank_transfer', 'PAY-UPDATE');
 
-        expect($partner->fresh()->total_commissions_paid)->toBe(1500.00);
+        expect($partner->fresh()->total_commissions_paid)->toBe('1500.00');
     });
 
     test('increments partner total for multiple payments', function () {
@@ -357,7 +357,7 @@ describe('Partner Total Commissions Paid Update', function () {
         $commission1->markAsPaid($user->id, 'bank_transfer', 'PAY-1');
         $commission2->markAsPaid($user->id, 'bank_transfer', 'PAY-2');
 
-        expect($partner->fresh()->total_commissions_paid)->toBe(2250.00);
+        expect($partner->fresh()->total_commissions_paid)->toBe('2250.00');
     });
 });
 
@@ -481,44 +481,52 @@ describe('Commission Currency Conversion', function () {
         ]);
 
         expect($commission->currency)->toBe('THB');
-        expect($commission->amount)->toBe(35500.00);
-        expect($commission->amount_usd)->toBeFloat();
-        expect($commission->amount_usd)->toBeLessThan($commission->amount);
+        expect($commission->amount)->toBe('35500.00');
+        expect($commission->amount_usd)->toBeString();
+        expect((float)$commission->amount_usd)->toBeLessThan((float)$commission->amount);
     });
 
     test('stores USD amount directly', function () {
         $commission = Commission::factory()->usd()->create([
             'amount' => 1000.00,
+            'amount_usd' => 1000.00,
         ]);
 
         expect($commission->currency)->toBe('USD');
-        expect($commission->amount)->toBe(1000.00);
-        expect($commission->amount_usd)->toBe(1000.00);
+        expect($commission->amount)->toBe('1000.00');
+        expect($commission->amount_usd)->toBe('1000.00');
     });
 
     test('exchange rate is recorded', function () {
         $commission = Commission::factory()->thb()->create();
 
-        expect($commission->exchange_rate)->toBeFloat();
-        expect($commission->exchange_rate)->toBeGreaterThan(0);
+        expect($commission->exchange_rate)->toBeString();
+        expect((float)$commission->exchange_rate)->toBeGreaterThan(0);
     });
 });
 
 describe('Commission Relationship to Booking', function () {
     test('commission is linked to booking', function () {
-        $booking = Booking::factory()->completed()->create([
+        $booking = Booking::factory()->confirmed()->create([
             'amount' => 10000.00,
             'commission_amount' => 1500.00,
         ]);
 
+        // Complete the booking to trigger commission creation
+        $booking->complete();
+
         $commission = $booking->commissions()->first();
 
         expect($commission->booking_id)->toBe($booking->id);
-        expect($commission->amount)->toBe(1500.00);
+        expect($commission->amount)->toBe('1500.00');
     });
 
     test('can access booking from commission', function () {
-        $booking = Booking::factory()->completed()->create();
+        $booking = Booking::factory()->confirmed()->create();
+
+        // Complete the booking to trigger commission creation
+        $booking->complete();
+
         $commission = $booking->commissions()->first();
 
         expect($commission->booking->id)->toBe($booking->id);

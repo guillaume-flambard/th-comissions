@@ -92,11 +92,11 @@ export default function PartnerShow({
         },
         {
             title: 'Partners',
-            href: '/partners',
+            href: '/admin/partners',
         },
         {
             title: partner.name,
-            href: `/partners/${partner.id}`,
+            href: `/admin/partners/${partner.id}`,
         },
     ];
 
@@ -146,7 +146,7 @@ export default function PartnerShow({
      * Handle edit partner
      */
     const handleEdit = () => {
-        router.visit(`/partners/${partner.id}/edit`);
+        router.visit(`/admin/partners/${partner.id}/edit`);
     };
 
     /**
@@ -176,8 +176,8 @@ export default function PartnerShow({
                 `Are you sure you want to delete ${partner.name}? This action cannot be undone.`,
             )
         ) {
-            router.delete(`/partners/${partner.id}`, {
-                onSuccess: () => router.visit('/partners'),
+            router.delete(`/admin/partners/${partner.id}`, {
+                onSuccess: () => router.visit('/admin/partners'),
             });
         }
     };
@@ -186,7 +186,7 @@ export default function PartnerShow({
      * Handle mark payment
      */
     const handleMarkPayment = () => {
-        router.visit(`/partners/${partner.id}/mark-payment`);
+        router.visit(`/admin/partners/${partner.id}/mark-payment`);
     };
 
     return (
@@ -312,17 +312,19 @@ export default function PartnerShow({
                                 )}
 
                                 {/* Commission Rate */}
-                                <div className="flex items-start gap-3">
-                                    <TrendingUpIcon className="mt-0.5 size-5 shrink-0 text-slate-400" />
-                                    <div className="min-w-0">
-                                        <p className="text-xs text-slate-500 dark:text-slate-500">
-                                            Default Commission Rate
-                                        </p>
-                                        <p className="mt-0.5 text-lg font-semibold text-blue-600 dark:text-blue-400">
-                                            {partner.commission_rate}%
-                                        </p>
+                                {partner.default_commission_rate && (
+                                    <div className="flex items-start gap-3">
+                                        <TrendingUpIcon className="mt-0.5 size-5 shrink-0 text-slate-400" />
+                                        <div className="min-w-0">
+                                            <p className="text-xs text-slate-500 dark:text-slate-500">
+                                                Default Commission Rate
+                                            </p>
+                                            <p className="mt-0.5 text-lg font-semibold text-blue-600 dark:text-blue-400">
+                                                {partner.default_commission_rate}%
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {/* QR Code Section */}
                                 {qr_code && (

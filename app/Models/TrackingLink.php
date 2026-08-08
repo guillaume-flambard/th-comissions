@@ -14,6 +14,7 @@ class TrackingLink extends Model
 
     protected $fillable = [
         'partner_id',
+        'user_id',
         'unique_code',
         'utm_source',
         'utm_medium',
@@ -81,9 +82,19 @@ class TrackingLink extends Model
         return $this->belongsTo(Partner::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(Referral::class);
     }
 
     /**
@@ -121,6 +132,22 @@ class TrackingLink extends Model
     public function getShortUrlAttribute(): string
     {
         return config('app.url') . '/r/' . $this->unique_code;
+    }
+
+    /**
+     * Alias for unique_code (for backward compatibility)
+     */
+    public function getShortCodeAttribute(): string
+    {
+        return $this->unique_code;
+    }
+
+    /**
+     * Alias for utm_campaign (for convenience)
+     */
+    public function getCampaignAttribute(): ?string
+    {
+        return $this->utm_campaign;
     }
 
     /**
@@ -171,11 +198,36 @@ class TrackingLink extends Model
             ->where('expires_at', '<=', now());
     }
 
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
     public function scopeTopPerformers($query, $limit = 10)
     {
         return $query->active()
             ->where('clicks', '>', 0)
             ->orderBy('conversion_rate', 'desc')
             ->limit($limit);
+    }
+
+    /**
+     * Alternative method for incrementing clicks (matches spec)
+     */
+    public function incrementClicks(): void
+    {
+        $this->recordClick();
+    }
+
+    /**
+     * Generate unique short code (8 characters as per spec)
+     */
+    public static function generateShortCode(): string
+    {
+        do {
+            $code = strtoupper(Str::random(8));
+        } while (self::where('unique_code', $code)->exists());
+
+        return $code;
     }
 }

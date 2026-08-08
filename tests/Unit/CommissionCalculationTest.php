@@ -189,7 +189,7 @@ describe('Booking Model Commission Calculation Integration', function () {
             'commission_structure' => 'percentage',
         ]);
 
-        expect($booking->commission_amount)->toBe(1500.00);
+        expect($booking->commission_amount)->toBe('1500.00');
     });
 
     test('automatically calculates commission on booking creation with fixed structure', function () {
@@ -199,7 +199,7 @@ describe('Booking Model Commission Calculation Integration', function () {
             'commission_structure' => 'fixed',
         ]);
 
-        expect($booking->commission_amount)->toBe(500.00);
+        expect($booking->commission_amount)->toBe('500.00');
     });
 
     test('preserves manually set commission amount', function () {
@@ -210,7 +210,7 @@ describe('Booking Model Commission Calculation Integration', function () {
             'commission_amount' => 2000.00, // Override
         ]);
 
-        expect($booking->commission_amount)->toBe(2000.00);
+        expect($booking->commission_amount)->toBe('2000.00');
     });
 });
 
@@ -223,7 +223,7 @@ describe('Commission Calculation with Different Currencies', function () {
             'currency' => 'THB',
         ]);
 
-        expect($booking->commission_amount)->toBe(5325.00);
+        expect($booking->commission_amount)->toBe('5325.00');
         expect($booking->currency)->toBe('THB');
     });
 
@@ -235,7 +235,7 @@ describe('Commission Calculation with Different Currencies', function () {
             'currency' => 'USD',
         ]);
 
-        expect($booking->commission_amount)->toBe(150.00);
+        expect($booking->commission_amount)->toBe('150.00');
         expect($booking->currency)->toBe('USD');
     });
 });
@@ -283,7 +283,7 @@ describe('Real-world Scenarios', function () {
             'currency' => 'THB',
         ]);
 
-        expect($booking->commission_amount)->toBe(525.00);
+        expect($booking->commission_amount)->toBe('525.00');
     });
 
     test('calculates commission for luxury package booking', function () {
@@ -295,7 +295,7 @@ describe('Real-world Scenarios', function () {
             'currency' => 'THB',
         ]);
 
-        expect($booking->commission_amount)->toBe(22500.00);
+        expect($booking->commission_amount)->toBe('22500.00');
     });
 
     test('calculates commission for activity booking with odd pricing', function () {
@@ -307,6 +307,6 @@ describe('Real-world Scenarios', function () {
             'currency' => 'THB',
         ]);
 
-        expect($booking->commission_amount)->toBe(162.38);
+        expect($booking->commission_amount)->toBe('162.38');
     });
 });

@@ -8,6 +8,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
+import {
+    create as adminPartnersCreate,
+    destroy as adminPartnersDestroy,
+    edit as adminPartnersEdit,
+    generateQr as adminPartnersGenerateQr,
+    index as adminPartnersIndex,
+    show as adminPartnersShow,
+} from '@/routes/admin/partners';
+import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import {
     Activity,
@@ -71,6 +81,13 @@ interface Props {
     tiers: PartnerTier[];
 }
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Partners',
+        href: adminPartnersIndex().url,
+    },
+];
+
 export default function PartnersIndex({
     partners,
     filters,
@@ -89,7 +106,7 @@ export default function PartnersIndex({
 
     const handleFilter = (key: string, value: string) => {
         router.get(
-            route('admin.partners.index'),
+            adminPartnersIndex().url,
             { ...filters, [key]: value, page: 1 },
             { preserveState: true, preserveScroll: true },
         );
@@ -101,7 +118,7 @@ export default function PartnersIndex({
                 ? 'desc'
                 : 'asc';
         router.get(
-            route('admin.partners.index'),
+            adminPartnersIndex().url,
             { ...filters, sort_by: sortBy, sort_direction: direction },
             { preserveState: true, preserveScroll: true },
         );
@@ -137,23 +154,24 @@ export default function PartnersIndex({
         );
     };
 
-    const getEngagementIndicator = (score: number) => {
-        if (score >= 80) {
+    const getEngagementIndicator = (score?: number) => {
+        const safeScore = Number(score || 0);
+        if (safeScore >= 80) {
             return (
                 <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
                     <TrendingUp className="h-4 w-4" />
                     <span className="text-sm font-medium">
-                        {score.toFixed(0)}
+                        {safeScore.toFixed(0)}
                     </span>
                 </div>
             );
         }
-        if (score >= 50) {
+        if (safeScore >= 50) {
             return (
                 <div className="flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
                     <Activity className="h-4 w-4" />
                     <span className="text-sm font-medium">
-                        {score.toFixed(0)}
+                        {safeScore.toFixed(0)}
                     </span>
                 </div>
             );
@@ -161,56 +179,50 @@ export default function PartnersIndex({
         return (
             <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
                 <TrendingDown className="h-4 w-4" />
-                <span className="text-sm font-medium">{score.toFixed(0)}</span>
+                <span className="text-sm font-medium">{safeScore.toFixed(0)}</span>
             </div>
         );
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Partners Management" />
 
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-                <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                    {/* Header */}
-                    <div className="mb-8 flex items-center justify-between">
-                        <div>
-                            <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                                <Users className="h-8 w-8 text-blue-500" />
-                                Partners Management
-                            </h1>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                {partners.total} partners "{' '}
-                                {
-                                    partners.data.filter((p) => p.is_active)
-                                        .length
-                                }{' '}
-                                active
-                            </p>
-                        </div>
-                        <div className="flex gap-3">
-                            <Button
-                                variant="outline"
-                                onClick={() =>
-                                    router.get(route('admin.partners.export'))
-                                }
-                            >
-                                <Download className="mr-2 h-4 w-4" />
-                                Export CSV
-                            </Button>
-                            <Button
-                                onClick={() =>
-                                    router.get(route('admin.partners.create'))
-                                }
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add Partner
-                            </Button>
-                        </div>
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl dark:text-white">
+                            <Users className="h-8 w-8 text-blue-500" />
+                            Partners Management
+                        </h1>
+                        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                            {partners.total} partners · {partners.data.filter((p) => p.is_active).length} active
+                        </p>
                     </div>
+                    <div className="flex gap-3">
+                        <Button
+                            variant="outline"
+                            onClick={() =>
+                                window.alert('Export feature coming soon!')
+                            }
+                        >
+                            <Download className="mr-2 h-4 w-4" />
+                            Export CSV
+                        </Button>
+                        <Button
+                            onClick={() =>
+                                router.get(adminPartnersCreate().url)
+                            }
+                        >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Partner
+                        </Button>
+                    </div>
+                </div>
 
-                    {/* Filters */}
-                    <Card className="mb-6 border-0 shadow-lg">
+                {/* Filters */}
+                <Card>
                         <CardContent className="pt-6">
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
                                 {/* Search */}
@@ -319,8 +331,8 @@ export default function PartnersIndex({
                         </CardContent>
                     </Card>
 
-                    {/* Partners Table */}
-                    <Card className="border-0 shadow-lg">
+                {/* Partners Table */}
+                <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Filter className="h-5 w-5 text-blue-500" />
@@ -399,8 +411,8 @@ export default function PartnersIndex({
                                                             {partner.business_type.replace(
                                                                 '_',
                                                                 ' ',
-                                                            )}{' '}
-                                                            " {partner.city}
+                                                            )}
+                                                            {partner.city && ` · ${partner.city}`}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -439,15 +451,15 @@ export default function PartnersIndex({
                                                     <div>
                                                         <div className="font-medium text-gray-900 dark:text-white">
                                                             {
-                                                                partner.successful_conversions
+                                                                partner.successful_conversions || 0
                                                             }
                                                             /
                                                             {
-                                                                partner.total_referrals
+                                                                partner.total_referrals || 0
                                                             }
                                                         </div>
                                                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                            {partner.conversion_rate.toFixed(
+                                                            {Number(partner.conversion_rate || 0).toFixed(
                                                                 1,
                                                             )}
                                                             %
@@ -469,10 +481,7 @@ export default function PartnersIndex({
                                                             size="sm"
                                                             onClick={() =>
                                                                 router.get(
-                                                                    route(
-                                                                        'admin.partners.show',
-                                                                        partner.id,
-                                                                    ),
+                                                                    adminPartnersShow(partner.id).url,
                                                                 )
                                                             }
                                                         >
@@ -482,11 +491,8 @@ export default function PartnersIndex({
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() =>
-                                                                router.get(
-                                                                    route(
-                                                                        'admin.partners.qr',
-                                                                        partner.id,
-                                                                    ),
+                                                                router.post(
+                                                                    adminPartnersGenerateQr(partner.id).url,
                                                                 )
                                                             }
                                                         >
@@ -532,9 +538,7 @@ export default function PartnersIndex({
                                                 size="sm"
                                                 onClick={() =>
                                                     router.get(
-                                                        route(
-                                                            'admin.partners.index',
-                                                        ),
+                                                        adminPartnersIndex().url,
                                                         { ...filters, page },
                                                         {
                                                             preserveState: true,
@@ -551,8 +555,7 @@ export default function PartnersIndex({
                             )}
                         </CardContent>
                     </Card>
-                </div>
             </div>
-        </>
+        </AppLayout>
     );
 }
